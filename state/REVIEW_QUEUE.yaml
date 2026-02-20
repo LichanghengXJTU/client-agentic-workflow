@@ -1,0 +1,7 @@
+items:
+  - id: "RQ-0001"
+    task_id: "T-0001"
+    title: "Bootstrap auditable workflow framework"
+    status: "pending"
+    created_at: "2026-02-20"
+    updated_at: "2026-02-20"

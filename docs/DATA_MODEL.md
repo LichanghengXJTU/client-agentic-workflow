@@ -1,0 +1,3 @@
+# DATA MODEL
+
+本文件将在后续阶段补全：TASKS / KEY_RESULTS / REVIEW_QUEUE schema。
