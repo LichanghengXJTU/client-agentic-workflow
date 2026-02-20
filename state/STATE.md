@@ -66,3 +66,6 @@
 - Base: main
 - Current branch: bootstrap/agentic-workflow
 - PR opened: https://github.com/LichanghengXJTU/client-agentic-workflow/pull/1
+
+## PR Updated
+- PR: #1
