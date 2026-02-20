@@ -1,1 +1,10 @@
-prs: []
+prs:
+- number: 1
+  title: 'feat: bootstrap auditable codex-chatgpt-github workflow framework'
+  state: OPEN
+  url: https://github.com/LichanghengXJTU/client-agentic-workflow/pull/1
+  head_ref: bootstrap/agentic-workflow
+  base_ref: main
+  head_sha: e432cae0191c8cec586b0e5c957af8e149f46f45
+  created_at: '2026-02-21T00:54:32'
+  updated_at: '2026-02-21T00:54:32'

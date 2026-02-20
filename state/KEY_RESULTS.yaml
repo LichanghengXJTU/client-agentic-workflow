@@ -79,3 +79,19 @@ results:
     first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
     last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
     checkpoint_tags: []
+
+  - id: "KR-0006"
+    statement: "远端仓库与自动 PR 链路已连通（origin 已推送 main 与 bootstrap 分支）。"
+    status: "verified"
+    confidence: "high"
+    evidence:
+      - "state/STATE.md"
+      - "artifacts/audit/pr-ready-brief.md"
+    verification:
+      - "python -m workflow pr list"
+      - "git remote -v"
+    related_tasks:
+      - "T-0009"
+    first_seen_commit: "e432cae0191c8cec586b0e5c957af8e149f46f45"
+    last_confirmed_commit: "e432cae0191c8cec586b0e5c957af8e149f46f45"
+    checkpoint_tags: []

@@ -140,7 +140,7 @@ tasks:
     type: "writing"
     priority: "P1"
     owner: "codex"
-    status: "in_progress"
+    status: "done"
     acceptance:
       - "WORKFLOW/DATA_MODEL/GOVERNANCE/AI_PROMPTS 文档完善"
       - "ci/audit/codex-review workflow 模板可用"
