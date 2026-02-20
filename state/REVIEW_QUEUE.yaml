@@ -1,7 +1,7 @@
 items:
-  - id: "RQ-0001"
-    task_id: "T-0001"
-    title: "Bootstrap auditable workflow framework"
+  - id: "RQ-0009"
+    task_id: "T-0009"
+    title: "人类最终审查与首次真实项目启动"
     status: "pending"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-20"
+    created_at: "2026-02-21"
+    updated_at: "2026-02-21"

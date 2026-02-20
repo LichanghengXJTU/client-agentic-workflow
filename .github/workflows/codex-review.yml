@@ -1,0 +1,27 @@
+name: Codex Review (Optional)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  codex-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Skip when secret missing
+        if: ${{ secrets.OPENAI_API_KEY == '' }}
+        run: echo "OPENAI_API_KEY missing. Skipping codex review safely."
+
+      - name: Run Codex Review
+        if: ${{ secrets.OPENAI_API_KEY != '' }}
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: .github/codex/prompts/review.md

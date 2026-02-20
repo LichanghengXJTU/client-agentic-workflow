@@ -1,15 +1,81 @@
 results:
   - id: "KR-0001"
-    statement: "Workflow bootstrapped from empty repository with governance-first constraints."
+    statement: "Workflow CLI 支持 status/tasks/review-queue/checkpoint/rollback/verify/audit/jobs/pr/ai。"
     status: "verified"
     confidence: "high"
     evidence:
-      - "state/STATE.md"
-      - "AGENTS.md"
+      - "workflow/__main__.py"
+      - "docs/WORKFLOW.md"
     verification:
+      - "python -m workflow status"
       - "python -m workflow audit"
     related_tasks:
       - "T-0001"
-    first_seen_commit: "TBD"
-    last_confirmed_commit: "TBD"
+      - "T-0004"
+    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    checkpoint_tags: []
+
+  - id: "KR-0002"
+    statement: "Reject 可触发安全级联重启：rollback 分支 + revert + 任务状态重置。"
+    status: "verified"
+    confidence: "high"
+    evidence:
+      - "workflow/review_ops.py"
+      - "tests/test_reject_cascade.py"
+    verification:
+      - "python -m pytest -q tests/test_reject_cascade.py"
+    related_tasks:
+      - "T-0006"
+    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    checkpoint_tags: []
+
+  - id: "KR-0003"
+    statement: "AI plan/audit 在无 API key 场景下仍可落盘 pending 报告且不中断流程。"
+    status: "verified"
+    confidence: "medium"
+    evidence:
+      - "workflow/ai.py"
+      - "state/PLAN.md"
+      - "artifacts/audit/ai-20260221-0044.md"
+    verification:
+      - "python -m workflow ai plan --prompt test"
+      - "python -m workflow ai audit --prompt test"
+    related_tasks:
+      - "T-0007"
+    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    checkpoint_tags: []
+
+  - id: "KR-0004"
+    statement: "推导示例 lemma1 的符号验证可运行并纳入 pytest。"
+    status: "verified"
+    confidence: "high"
+    evidence:
+      - "derivations/examples/lemma1.md"
+      - "derivations/examples/lemma1_check.py"
+      - "tests/test_lemma1.py"
+    verification:
+      - "python derivations/examples/lemma1_check.py"
+      - "python -m pytest -q tests/test_lemma1.py"
+    related_tasks:
+      - "T-0008"
+    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    checkpoint_tags: []
+
+  - id: "KR-0005"
+    statement: "Dashboard 可执行审批、checkpoint、safe rollback、verify、audit、jobs 与 AI 入口操作。"
+    status: "verified"
+    confidence: "medium"
+    evidence:
+      - "dashboard/app.py"
+      - "dashboard/components.py"
+    verification:
+      - "streamlit run dashboard/app.py"
+    related_tasks:
+      - "T-0005"
+    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
+    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
     checkpoint_tags: []

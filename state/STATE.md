@@ -45,3 +45,10 @@
 - Budget spend USD: 0.0
 - Budget ratio: 0.000
 - Message: OPENAI_API_KEY missing; generated pending report.
+
+## System Build Update (2026-02-21)
+- Implemented full CLI surface: status/sync/tasks/review-queue/checkpoint/checkpoints/rollback/verify/audit/jobs/pr/ai.
+- Implemented Streamlit dashboard with 6 tabs and git write-operation confirmation guard.
+- Added schema validation, audit report generation, verification pipeline, and derivation example with SymPy.
+- Added GitHub workflows for CI, manual audit, and optional codex review automation.
+- Added AI budget guardrails (80% alert, 100% downgrade) with local secret policy.

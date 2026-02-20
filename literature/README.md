@@ -1,5 +1,10 @@
-# Literature Workflow
+# Literature Workflow / 文献工作流
 
-- 文献阅读记录放在 `literature/notes/`。
-- 关键引用在 `references.bib` 管理。
-- 与 GUIDE 的关键结论互相链接并记录证据路径。
+## 结构
+- `literature/notes/`：逐篇阅读笔记（建议文件名含年份与作者）
+- `literature/references.bib`：BibTeX 引用库
+
+## 建议流程
+1. 阅读并记录核心结论与限制条件。
+2. 将可复用结论映射到 TASKS 或 KEY_RESULTS。
+3. 若结论影响推导/实验，补充验证脚本或实验设计。
