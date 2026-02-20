@@ -1,0 +1,15 @@
+results:
+  - id: "KR-0001"
+    statement: "Workflow bootstrapped from empty repository with governance-first constraints."
+    status: "verified"
+    confidence: "high"
+    evidence:
+      - "state/STATE.md"
+      - "AGENTS.md"
+    verification:
+      - "python -m workflow audit"
+    related_tasks:
+      - "T-0001"
+    first_seen_commit: "TBD"
+    last_confirmed_commit: "TBD"
+    checkpoint_tags: []

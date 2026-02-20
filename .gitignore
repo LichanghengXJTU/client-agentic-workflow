@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+.venv/
+venv/
+
+# Test/cache
+.pytest_cache/
+.mypy_cache/
+.cache/
+coverage.xml
+htmlcov/
+
+# Streamlit
+.streamlit/
+
+# Runtime artifacts
+artifacts/audit/*.tmp
+artifacts/test/*.tmp
+
+# Local secrets
+state/AI_SECRETS.local.yaml
+.env
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
