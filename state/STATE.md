@@ -24,3 +24,24 @@
 ## Risks
 - No remote configured yet; PR automation depends on GitHub remote creation.
 - Streamlit is not installed yet; dashboard smoke test depends on dependency install.
+
+## AI Plan
+- Model: gpt-5
+- Output: state/PLAN.md
+- Budget spend USD: 0.0
+- Budget ratio: 0.000
+- Message: OPENAI_API_KEY missing; generated pending report.
+
+## AI Audit
+- Model: gpt-5
+- Output: artifacts/audit/ai-20260221-0044.md
+- Budget spend USD: 0.0
+- Budget ratio: 0.000
+- Message: OPENAI_API_KEY missing; generated pending report.
+
+## AI Plan
+- Model: gpt-5
+- Output: state/PLAN.md
+- Budget spend USD: 0.0
+- Budget ratio: 0.000
+- Message: OPENAI_API_KEY missing; generated pending report.

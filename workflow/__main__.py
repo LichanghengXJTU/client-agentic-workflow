@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 from typing import Any
 
+from .ai import run_ai_audit, run_ai_plan
 from .audit import run_audit
 from .checkpoint import create_checkpoint, list_checkpoints
 from .git_ops import fetch, get_status, list_checkpoint_tags, pull_rebase, remote_exists
@@ -17,6 +19,7 @@ from .state_ops import (
     append_state_event,
     load_review_queue,
     load_tasks,
+    read_yaml,
     sync_review_queue_from_tasks,
     update_task,
 )
@@ -274,6 +277,65 @@ def cmd_pr_close_superseded(args: argparse.Namespace) -> int:
     return 0
 
 
+def _read_optional_file(path: str | None) -> str:
+    if not path:
+        return ""
+    p = Path(path)
+    return p.read_text(encoding="utf-8")
+
+
+def cmd_ai_plan(args: argparse.Namespace) -> int:
+    extra = _read_optional_file(args.input_file)
+    tasks = read_yaml("state/TASKS.yaml")
+    prompt = args.prompt or (
+        "请基于当前任务队列生成下一阶段 PLAN，要求可执行、可验证、可回滚。\\n\\n"
+        f"TASKS:\\n{json.dumps(tasks, ensure_ascii=False, indent=2)}\\n\\n"
+        f"EXTRA:\\n{extra}\\n"
+    )
+    result = run_ai_plan(prompt=prompt, output_path="state/PLAN.md")
+    append_state_event(
+        "AI Plan",
+        [
+            f"Model: {result.model}",
+            f"Output: {result.output_path}",
+            f"Budget spend USD: {result.spend_usd}",
+            f"Budget ratio: {result.budget_ratio:.3f}",
+            f"Message: {result.message}",
+        ],
+    )
+    _print(result.__dict__)
+    if not result.ok and "missing" in result.message.lower():
+        return 0
+    return 0 if result.ok else 1
+
+
+def cmd_ai_audit(args: argparse.Namespace) -> int:
+    extra = _read_optional_file(args.input_file)
+    tasks = read_yaml("state/TASKS.yaml")
+    key_results = read_yaml("state/KEY_RESULTS.yaml")
+    prompt = args.prompt or (
+        "请审计当前工作流状态，重点检查风险、验证覆盖率、审批闭环和回滚安全。\\n\\n"
+        f"TASKS:\\n{json.dumps(tasks, ensure_ascii=False, indent=2)}\\n\\n"
+        f"KEY_RESULTS:\\n{json.dumps(key_results, ensure_ascii=False, indent=2)}\\n\\n"
+        f"EXTRA:\\n{extra}\\n"
+    )
+    result = run_ai_audit(prompt=prompt)
+    append_state_event(
+        "AI Audit",
+        [
+            f"Model: {result.model}",
+            f"Output: {result.output_path}",
+            f"Budget spend USD: {result.spend_usd}",
+            f"Budget ratio: {result.budget_ratio:.3f}",
+            f"Message: {result.message}",
+        ],
+    )
+    _print(result.__dict__)
+    if not result.ok and "missing" in result.message.lower():
+        return 0
+    return 0 if result.ok else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m workflow")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -421,6 +483,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_pr_close = pr_sub.add_parser("close-superseded", help="Close open PRs superseded by rollback anchor")
     p_pr_close.add_argument("--anchor", required=True)
     p_pr_close.set_defaults(func=cmd_pr_close_superseded)
+
+    p_ai = sub.add_parser("ai", help="AI-assisted plan/audit with budget guardrails")
+    ai_sub = p_ai.add_subparsers(dest="ai_cmd", required=True)
+
+    p_ai_plan = ai_sub.add_parser("plan", help="Generate PLAN.md with Responses API")
+    p_ai_plan.add_argument("--prompt", help="Custom prompt override")
+    p_ai_plan.add_argument("--input-file", help="Optional file appended into prompt context")
+    p_ai_plan.set_defaults(func=cmd_ai_plan)
+
+    p_ai_audit = ai_sub.add_parser("audit", help="Generate AI audit markdown report")
+    p_ai_audit.add_argument("--prompt", help="Custom prompt override")
+    p_ai_audit.add_argument("--input-file", help="Optional file appended into prompt context")
+    p_ai_audit.set_defaults(func=cmd_ai_audit)
 
     return parser
 

@@ -1,0 +1,7 @@
+default_model: "gpt-5"
+low_cost_model: "gpt-4.1-mini"
+reasoning_effort: "high"
+price_per_1m_input_usd: 10.0
+price_per_1m_output_usd: 30.0
+price_per_1m_cached_input_usd: 2.5
+notes: "Do not store API key here. Put key in state/AI_SECRETS.local.yaml or OPENAI_API_KEY env."

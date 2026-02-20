@@ -1,0 +1,22 @@
+monthly_budget_usd: 2000.0
+alert_threshold: 0.8
+hard_limit_threshold: 1.0
+current_month: 2026-02
+spend_usd: 0.0
+entries:
+- time: '2026-02-21T00:44:30'
+  task_type: audit
+  model: gpt-5
+  input_tokens: 0
+  output_tokens: 0
+  cached_tokens: 0
+  cost_usd: 0.0
+  note: missing_api_key
+- time: '2026-02-21T00:44:46'
+  task_type: plan
+  model: gpt-5
+  input_tokens: 0
+  output_tokens: 0
+  cached_tokens: 0
+  cost_usd: 0.0
+  note: missing_api_key

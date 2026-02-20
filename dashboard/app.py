@@ -1,22 +1,20 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
 import yaml
 
 from dashboard.components import git_write_guard, section_header, status_badge
+from workflow.ai import run_ai_audit, run_ai_plan
 from workflow.audit import run_audit
 from workflow.checkpoint import create_checkpoint, list_checkpoints
 from workflow.git_ops import get_status
+from workflow.jobs import list_jobs, start_job, stop_job, tail_job_log
 from workflow.review_ops import apply_review_action
 from workflow.rollback import HARD_CONFIRM_PHRASE, rollback
-from workflow.state_ops import (
-    load_review_queue,
-    load_tasks,
-    save_tasks,
-    sync_review_queue_from_tasks,
-)
+from workflow.state_ops import load_review_queue, load_tasks, save_tasks, sync_review_queue_from_tasks
 from workflow.verify import run_verify
 
 st.set_page_config(page_title="Agentic Workflow Dashboard", layout="wide")
@@ -31,16 +29,15 @@ def _latest_audit_report() -> Path | None:
     return files[-1] if files else None
 
 
+def _today() -> str:
+    return datetime.now().strftime("%Y-%m-%d")
+
+
 def _render_overview() -> None:
     section_header("Overview", "仓库状态 / Checkpoint / 任务统计 / 最新审计")
     status = get_status()
     checkpoints = list_checkpoints()
     tasks = load_tasks()
-
-    todo = len([t for t in tasks if t.get("status") == "todo"])
-    in_progress = len([t for t in tasks if t.get("status") == "in_progress"])
-    waiting_review = len([t for t in tasks if t.get("status") == "waiting_review"])
-    done = len([t for t in tasks if t.get("status") == "done"])
 
     c1, c2 = st.columns(2)
     with c1:
@@ -55,16 +52,15 @@ def _render_overview() -> None:
         else:
             status_badge("Latest Checkpoint", "none")
 
+    stats = {
+        "todo": len([t for t in tasks if t.get("status") == "todo"]),
+        "in_progress": len([t for t in tasks if t.get("status") == "in_progress"]),
+        "waiting_review": len([t for t in tasks if t.get("status") == "waiting_review"]),
+        "done": len([t for t in tasks if t.get("status") == "done"]),
+        "total": len(tasks),
+    }
     st.markdown("### TASKS Stats")
-    st.write(
-        {
-            "todo": todo,
-            "in_progress": in_progress,
-            "waiting_review": waiting_review,
-            "done": done,
-            "total": len(tasks),
-        }
-    )
+    st.write(stats)
 
     latest_audit = _latest_audit_report()
     st.markdown("### Latest Audit")
@@ -81,8 +77,8 @@ def _render_tasks() -> None:
     st.markdown("### Current TASKS")
     st.dataframe(tasks, use_container_width=True)
 
-    st.markdown("### 新增任务 / Add Task")
     with st.form("add_task_form"):
+        st.markdown("### 新增任务 / Add Task")
         title = st.text_input("Title")
         task_type = st.selectbox("Type", ["derivation", "code", "writing", "literature", "experiment", "meta"])
         priority = st.selectbox("Priority", ["P0", "P1", "P2"])
@@ -94,7 +90,7 @@ def _render_tasks() -> None:
         depends_on = st.text_area("Depends On task IDs (one per line)")
         submitted = st.form_submit_button("Add Task")
         if submitted and title.strip():
-            new_id = f"T-{(len(tasks)+1):04d}"
+            new_id = f"T-{(len(tasks) + 1):04d}"
             tasks.append(
                 {
                     "id": new_id,
@@ -107,15 +103,19 @@ def _render_tasks() -> None:
                     "evidence": [x.strip() for x in evidence.splitlines() if x.strip()],
                     "verification": [x.strip() for x in verification.splitlines() if x.strip()],
                     "depends_on": [x.strip() for x in depends_on.splitlines() if x.strip()],
-                    "created_at": "2026-02-20",
-                    "updated_at": "2026-02-20",
+                    "created_at": _today(),
+                    "updated_at": _today(),
                 }
             )
             save_tasks(tasks)
             st.success(f"Task added: {new_id}")
 
     st.markdown("### 编辑并保存 / Edit-and-save")
-    yaml_text = st.text_area("TASKS.yaml content", value=yaml.safe_dump({"tasks": tasks}, allow_unicode=True, sort_keys=False), height=280)
+    yaml_text = st.text_area(
+        "TASKS.yaml content",
+        value=yaml.safe_dump({"tasks": tasks}, allow_unicode=True, sort_keys=False),
+        height=280,
+    )
     if st.button("Save TASKS.yaml"):
         parsed = yaml.safe_load(yaml_text) or {}
         save_tasks(parsed.get("tasks", []))
@@ -124,7 +124,6 @@ def _render_tasks() -> None:
 
 def _render_review_queue() -> None:
     section_header("Review Queue", "人类审批：Approve / Rework / Reject")
-
     if st.button("Sync from TASKS waiting_review"):
         items = sync_review_queue_from_tasks()
         st.success(f"Synced {len(items)} review items.")
@@ -166,8 +165,7 @@ def _render_checkpoints() -> None:
     summary = st.text_input("Summary", value="manual checkpoint")
     message = st.text_input("Commit message (optional)", value="")
     key_results = st.text_input("Related KEY_RESULTS IDs (comma separated)", value="")
-    command_preview = f"python -m workflow checkpoint --summary \"{summary}\""
-    allow_checkpoint = git_write_guard("create_checkpoint", command_preview)
+    allow_checkpoint = git_write_guard("create_checkpoint", f"python -m workflow checkpoint --summary \"{summary}\"")
     if st.button("Create checkpoint"):
         if not allow_checkpoint:
             st.error("Please confirm git write operation first.")
@@ -182,8 +180,7 @@ def _render_checkpoints() -> None:
     st.markdown("### Safe Rollback")
     options = [c["tag"] for c in checkpoints]
     anchor = st.selectbox("Anchor checkpoint", options=options if options else [""], index=0)
-    rb_preview = f"python -m workflow rollback --mode safe --anchor {anchor}"
-    allow_rb = git_write_guard("safe_rollback", rb_preview)
+    allow_rb = git_write_guard("safe_rollback", f"python -m workflow rollback --mode safe --anchor {anchor}")
     if st.button("Run safe rollback"):
         if not anchor:
             st.error("No checkpoint available.")
@@ -195,8 +192,11 @@ def _render_checkpoints() -> None:
 
     st.markdown("### Hard Rollback (Advanced)")
     hard_anchor = st.text_input("Hard rollback anchor")
-    hard_preview = f"python -m workflow rollback --mode hard --anchor {hard_anchor} --confirm-phrase {HARD_CONFIRM_PHRASE}"
-    allow_hard = git_write_guard("hard_rollback", hard_preview, phrase_required=HARD_CONFIRM_PHRASE)
+    allow_hard = git_write_guard(
+        "hard_rollback",
+        f"python -m workflow rollback --mode hard --anchor {hard_anchor} --confirm-phrase {HARD_CONFIRM_PHRASE}",
+        phrase_required=HARD_CONFIRM_PHRASE,
+    )
     if st.button("Run hard rollback"):
         if not hard_anchor.strip():
             st.error("Please input anchor ref")
@@ -210,10 +210,8 @@ def _render_checkpoints() -> None:
 def _render_audit_verify() -> None:
     section_header("Audit & Verify", "运行验证与审计")
     c1, c2 = st.columns(2)
-
     if c1.button("Run Verify"):
         result = run_verify()
-        st.session_state["verify_result"] = result
         if result.ok:
             st.success(f"Verify PASS, report: {result.report_path}")
         else:
@@ -221,7 +219,6 @@ def _render_audit_verify() -> None:
 
     if c2.button("Run Audit"):
         result = run_audit()
-        st.session_state["audit_result"] = result
         if result.p0 == 0:
             st.success(f"Audit completed, report: {result.report_path}")
         else:
@@ -234,11 +231,44 @@ def _render_audit_verify() -> None:
 
 
 def _render_jobs_ai() -> None:
-    section_header("Jobs & AI", "后台任务与 AI 计划/审计（后续命令可直接接入）")
-    st.info(
-        "Jobs 与 AI 命令已在 CLI 规划中。当前面板先保留入口位，"
-        "下一阶段将接入 `workflow jobs` 与 `workflow ai` 的可视化控制。"
-    )
+    section_header("Jobs & AI", "后台任务管理 + AI Plan/Audit")
+
+    st.markdown("### Jobs")
+    with st.form("job_start_form"):
+        cmd = st.text_input("Command", value="python3 -m workflow verify")
+        workdir = st.text_input("Workdir (optional)", value="")
+        submitted = st.form_submit_button("Start Job")
+        if submitted:
+            result = start_job(command=cmd, workdir=workdir or None)
+            st.success(f"Started {result.id} pid={result.pid}")
+
+    jobs = list_jobs()
+    st.dataframe(jobs, use_container_width=True)
+    if jobs:
+        selected = st.selectbox("Select Job", options=[j["id"] for j in jobs], key="job_select")
+        c1, c2 = st.columns(2)
+        if c1.button("Show Job Logs"):
+            st.code(tail_job_log(selected, lines=120), language="text")
+        if c2.button("Stop Job"):
+            item = stop_job(selected)
+            st.warning(f"Job {item['id']} -> {item['status']}")
+
+    st.markdown("### AI Plan / Audit")
+    extra = st.text_area("Extra Context", value="", height=120)
+    c3, c4 = st.columns(2)
+    if c3.button("Run AI Plan"):
+        result = run_ai_plan(prompt=extra or "Generate actionable PLAN.md for current repo state.")
+        if result.ok:
+            st.success(f"AI plan generated: {result.output_path} | model={result.model}")
+        else:
+            st.warning(f"AI plan pending: {result.output_path} | {result.message}")
+
+    if c4.button("Run AI Audit"):
+        result = run_ai_audit(prompt=extra or "Audit current workflow state with risk prioritization.")
+        if result.ok:
+            st.success(f"AI audit generated: {result.output_path} | model={result.model}")
+        else:
+            st.warning(f"AI audit pending: {result.output_path} | {result.message}")
 
 
 def main() -> None:
