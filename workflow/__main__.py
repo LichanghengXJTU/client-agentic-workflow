@@ -20,6 +20,7 @@ from .state_ops import (
     task_by_id,
     update_task,
 )
+from .verify import run_verify
 
 
 def _print(data: Any) -> None:
@@ -55,6 +56,24 @@ def cmd_audit(_: argparse.Namespace) -> int:
         }
     )
     return 1 if result.p0 > 0 else 0
+
+
+def cmd_verify(_: argparse.Namespace) -> int:
+    result = run_verify()
+    _print(
+        {
+            "ok": result.ok,
+            "report": str(result.report_path) if result.report_path else None,
+            "steps": [
+                {
+                    "command": step.command,
+                    "returncode": step.returncode,
+                }
+                for step in result.steps
+            ],
+        }
+    )
+    return 0 if result.ok else 1
 
 
 def cmd_checkpoint(args: argparse.Namespace) -> int:
@@ -221,6 +240,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_audit = sub.add_parser("audit", help="Run local audit and generate markdown report")
     p_audit.set_defaults(func=cmd_audit)
+
+    p_verify = sub.add_parser("verify", help="Run pytest + derivation verification checks")
+    p_verify.set_defaults(func=cmd_verify)
 
     p_checkpoint = sub.add_parser("checkpoint", help="Create a checkpoint commit/tag + state records")
     p_checkpoint.add_argument("--summary", required=True, help="Checkpoint summary")
