@@ -1,133 +1,130 @@
 results:
-  - id: "KR-0001"
-    statement: "Workflow CLI 支持 status/tasks/review-queue/checkpoint/rollback/verify/audit/jobs/pr/ai。"
-    status: "verified"
-    confidence: "high"
-    evidence:
-      - "workflow/__main__.py"
-      - "docs/WORKFLOW.md"
-    verification:
-      - "python -m workflow status"
-      - "python -m workflow audit"
-    related_tasks:
-      - "T-0001"
-      - "T-0004"
-    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    checkpoint_tags: []
-
-  - id: "KR-0002"
-    statement: "Reject 可触发安全级联重启：rollback 分支 + revert + 任务状态重置。"
-    status: "verified"
-    confidence: "high"
-    evidence:
-      - "workflow/review_ops.py"
-      - "tests/test_reject_cascade.py"
-    verification:
-      - "python -m pytest -q tests/test_reject_cascade.py"
-    related_tasks:
-      - "T-0006"
-    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    checkpoint_tags: []
-
-  - id: "KR-0003"
-    statement: "AI plan/audit 在无 API key 场景下仍可落盘 pending 报告且不中断流程。"
-    status: "verified"
-    confidence: "medium"
-    evidence:
-      - "workflow/ai.py"
-      - "state/PLAN.md"
-      - "artifacts/audit/ai-20260221-0044.md"
-    verification:
-      - "python -m workflow ai plan --prompt test"
-      - "python -m workflow ai audit --prompt test"
-    related_tasks:
-      - "T-0007"
-    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    checkpoint_tags: []
-
-  - id: "KR-0004"
-    statement: "推导示例 lemma1 的符号验证可运行并纳入 pytest。"
-    status: "verified"
-    confidence: "high"
-    evidence:
-      - "derivations/examples/lemma1.md"
-      - "derivations/examples/lemma1_check.py"
-      - "tests/test_lemma1.py"
-    verification:
-      - "python derivations/examples/lemma1_check.py"
-      - "python -m pytest -q tests/test_lemma1.py"
-    related_tasks:
-      - "T-0008"
-    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    checkpoint_tags: []
-
-  - id: "KR-0005"
-    statement: "Dashboard 可执行审批、checkpoint、safe rollback、verify、audit、jobs 与 AI 入口操作。"
-    status: "verified"
-    confidence: "medium"
-    evidence:
-      - "dashboard/app.py"
-      - "dashboard/components.py"
-    verification:
-      - "streamlit run dashboard/app.py"
-    related_tasks:
-      - "T-0005"
-    first_seen_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    last_confirmed_commit: "cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537"
-    checkpoint_tags: []
-
-  - id: "KR-0006"
-    statement: "远端仓库与自动 PR 链路已连通（origin 已推送 main 与 bootstrap 分支）。"
-    status: "verified"
-    confidence: "high"
-    evidence:
-      - "state/STATE.md"
-      - "artifacts/audit/pr-ready-brief.md"
-    verification:
-      - "python -m workflow pr list"
-      - "git remote -v"
-    related_tasks:
-      - "T-0009"
-    first_seen_commit: "e432cae0191c8cec586b0e5c957af8e149f46f45"
-    last_confirmed_commit: "e432cae0191c8cec586b0e5c957af8e149f46f45"
-    checkpoint_tags: []
-
-  - id: "KR-0007"
-    statement: "RL Gridworld Q-learning 实验在固定 seed 下可复现，且训练后期回报与成功率优于初期。"
-    status: "verified"
-    confidence: "high"
-    evidence:
-      - "projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py"
-      - "artifacts/experiments/rl-gridworld-qlearning/summary.json"
-      - "tests/test_rl_gridworld_qlearning.py"
-    verification:
-      - ".venv/bin/python projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py"
-      - ".venv/bin/python -m pytest -q tests/test_rl_gridworld_qlearning.py"
-    related_tasks:
-      - "T-0011"
-      - "T-0012"
-    first_seen_commit: "TBD"
-    last_confirmed_commit: "TBD"
-    checkpoint_tags: []
-
-  - id: "KR-0008"
-    statement: "跨库发布链路已打通：release bootstrap/publish/pr 可创建公开发布仓并记录 release PR。"
-    status: "verified"
-    confidence: "high"
-    evidence:
-      - "workflow/release_ops.py"
-      - "state/PR_REGISTRY.yaml"
-      - "https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release/pull/1"
-    verification:
-      - ".venv/bin/python -m workflow release bootstrap --project rl-gridworld-qlearning --visibility public"
-      - ".venv/bin/python -m workflow release publish --project rl-gridworld-qlearning"
-      - ".venv/bin/python -m workflow release pr --project rl-gridworld-qlearning --title release --body body"
-    related_tasks:
-      - "T-0013"
-    first_seen_commit: "TBD"
-    last_confirmed_commit: "TBD"
-    checkpoint_tags: []
+- id: KR-0001
+  statement: Workflow CLI 支持 status/tasks/review-queue/checkpoint/rollback/verify/audit/jobs/pr/ai。
+  status: verified
+  confidence: high
+  evidence:
+  - workflow/__main__.py
+  - docs/WORKFLOW.md
+  verification:
+  - python -m workflow status
+  - python -m workflow audit
+  related_tasks:
+  - T-0001
+  - T-0004
+  first_seen_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  last_confirmed_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  checkpoint_tags: []
+- id: KR-0002
+  statement: Reject 可触发安全级联重启：rollback 分支 + revert + 任务状态重置。
+  status: verified
+  confidence: high
+  evidence:
+  - workflow/review_ops.py
+  - tests/test_reject_cascade.py
+  verification:
+  - python -m pytest -q tests/test_reject_cascade.py
+  related_tasks:
+  - T-0006
+  first_seen_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  last_confirmed_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  checkpoint_tags: []
+- id: KR-0003
+  statement: AI plan/audit 在无 API key 场景下仍可落盘 pending 报告且不中断流程。
+  status: verified
+  confidence: medium
+  evidence:
+  - workflow/ai.py
+  - state/PLAN.md
+  - artifacts/audit/ai-20260221-0044.md
+  verification:
+  - python -m workflow ai plan --prompt test
+  - python -m workflow ai audit --prompt test
+  related_tasks:
+  - T-0007
+  first_seen_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  last_confirmed_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  checkpoint_tags: []
+- id: KR-0004
+  statement: 推导示例 lemma1 的符号验证可运行并纳入 pytest。
+  status: verified
+  confidence: high
+  evidence:
+  - derivations/examples/lemma1.md
+  - derivations/examples/lemma1_check.py
+  - tests/test_lemma1.py
+  verification:
+  - python derivations/examples/lemma1_check.py
+  - python -m pytest -q tests/test_lemma1.py
+  related_tasks:
+  - T-0008
+  first_seen_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  last_confirmed_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  checkpoint_tags: []
+- id: KR-0005
+  statement: Dashboard 可执行审批、checkpoint、safe rollback、verify、audit、jobs 与 AI 入口操作。
+  status: verified
+  confidence: medium
+  evidence:
+  - dashboard/app.py
+  - dashboard/components.py
+  verification:
+  - streamlit run dashboard/app.py
+  related_tasks:
+  - T-0005
+  first_seen_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  last_confirmed_commit: cd77bd3d1b93c0a3a39b0cfde4dbebd6fb7fd537
+  checkpoint_tags: []
+- id: KR-0006
+  statement: 远端仓库与自动 PR 链路已连通（origin 已推送 main 与 bootstrap 分支）。
+  status: verified
+  confidence: high
+  evidence:
+  - state/STATE.md
+  - artifacts/audit/pr-ready-brief.md
+  verification:
+  - python -m workflow pr list
+  - git remote -v
+  related_tasks:
+  - T-0009
+  first_seen_commit: e432cae0191c8cec586b0e5c957af8e149f46f45
+  last_confirmed_commit: e432cae0191c8cec586b0e5c957af8e149f46f45
+  checkpoint_tags: []
+- id: KR-0007
+  statement: RL Gridworld Q-learning 实验在固定 seed 下可复现，且训练后期回报与成功率优于初期。
+  status: verified
+  confidence: high
+  evidence:
+  - projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py
+  - artifacts/experiments/rl-gridworld-qlearning/summary.json
+  - tests/test_rl_gridworld_qlearning.py
+  verification:
+  - .venv/bin/python projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py
+  - .venv/bin/python -m pytest -q tests/test_rl_gridworld_qlearning.py
+  related_tasks:
+  - T-0011
+  - T-0012
+  first_seen_commit: TBD
+  last_confirmed_commit: 8e03dc5b2ca65d995ef4e8c3bf6fe41b37557990
+  checkpoint_tags:
+  - cp-20260220-1918-rl-gridworld-qlearning-c
+- id: KR-0008
+  statement: 跨库发布链路已打通：release bootstrap/publish/pr 可创建公开发布仓并记录 release PR。
+  status: verified
+  confidence: high
+  evidence:
+  - workflow/release_ops.py
+  - state/PR_REGISTRY.yaml
+  - https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release/pull/1
+  verification:
+  - .venv/bin/python -m workflow release bootstrap --project rl-gridworld-qlearning
+    --visibility public
+  - .venv/bin/python -m workflow release publish --project rl-gridworld-qlearning
+  - .venv/bin/python -m workflow release pr --project rl-gridworld-qlearning --title
+    release --body body
+  related_tasks:
+  - T-0013
+  first_seen_commit: TBD
+  last_confirmed_commit: 8e03dc5b2ca65d995ef4e8c3bf6fe41b37557990
+  checkpoint_tags:
+  - cp-20260220-1918-rl-gridworld-qlearning-c
