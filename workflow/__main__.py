@@ -3,11 +3,31 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from typing import Any
 
-from .checkpoint import create_checkpoint, list_checkpoints
 from .audit import run_audit
+from .checkpoint import create_checkpoint, list_checkpoints
 from .git_ops import get_status, list_checkpoint_tags
 from .rollback import HARD_CONFIRM_PHRASE, rollback
+from .state_ops import (
+    add_task,
+    append_human_review_log,
+    append_state_event,
+    load_review_queue,
+    load_tasks,
+    set_review_item_status,
+    sync_review_queue_from_tasks,
+    task_by_id,
+    update_task,
+)
+
+
+def _print(data: Any) -> None:
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+
+
+def _parse_list(values: list[str] | None) -> list[str]:
+    return values or []
 
 
 def cmd_status(_: argparse.Namespace) -> int:
@@ -20,23 +40,19 @@ def cmd_status(_: argparse.Namespace) -> int:
         "dirty_count": status.dirty_count,
         "recent_checkpoint": tags[0] if tags else None,
     }
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    _print(payload)
     return 0
 
 
 def cmd_audit(_: argparse.Namespace) -> int:
     result = run_audit()
-    print(
-        json.dumps(
-            {
-                "report": str(result.report_path),
-                "p0": result.p0,
-                "p1": result.p1,
-                "p2": result.p2,
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
+    _print(
+        {
+            "report": str(result.report_path),
+            "p0": result.p0,
+            "p1": result.p1,
+            "p2": result.p2,
+        }
     )
     return 1 if result.p0 > 0 else 0
 
@@ -47,41 +63,152 @@ def cmd_checkpoint(args: argparse.Namespace) -> int:
         commit_message=args.message,
         related_key_results=args.key_result or [],
     )
-    print(
-        json.dumps(
-            {
-                "tag": result.tag,
-                "snapshot_commit": result.snapshot_commit,
-                "record_commit": result.record_commit,
-                "wrote_snapshot_metadata": result.wrote_snapshot_metadata,
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
+    _print(
+        {
+            "tag": result.tag,
+            "snapshot_commit": result.snapshot_commit,
+            "record_commit": result.record_commit,
+            "wrote_snapshot_metadata": result.wrote_snapshot_metadata,
+        }
     )
     return 0
 
 
 def cmd_checkpoints(_: argparse.Namespace) -> int:
-    items = list_checkpoints()
-    print(json.dumps(items, ensure_ascii=False, indent=2))
+    _print(list_checkpoints())
     return 0
 
 
 def cmd_rollback(args: argparse.Namespace) -> int:
     result = rollback(anchor_ref=args.anchor, mode=args.mode, confirm_phrase=args.confirm_phrase)
-    print(
-        json.dumps(
-            {
-                "mode": result.mode,
-                "anchor_ref": result.anchor_ref,
-                "branch": result.branch,
-                "reverted_count": result.reverted_count,
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
+    append_state_event(
+        "Rollback Update",
+        [
+            f"Mode: {result.mode}",
+            f"Anchor: {result.anchor_ref}",
+            f"Branch: {result.branch}",
+            f"Reverted count: {result.reverted_count}",
+        ],
     )
+    _print(
+        {
+            "mode": result.mode,
+            "anchor_ref": result.anchor_ref,
+            "branch": result.branch,
+            "reverted_count": result.reverted_count,
+        }
+    )
+    return 0
+
+
+def cmd_tasks_list(_: argparse.Namespace) -> int:
+    _print({"tasks": load_tasks()})
+    return 0
+
+
+def cmd_tasks_add(args: argparse.Namespace) -> int:
+    item = add_task(
+        title=args.title,
+        task_type=args.type,
+        priority=args.priority,
+        owner=args.owner,
+        status=args.status,
+        acceptance=_parse_list(args.acceptance),
+        evidence=_parse_list(args.evidence),
+        verification=_parse_list(args.verification),
+        depends_on=_parse_list(args.depends_on),
+    )
+    append_state_event("Task Added", [f"Task: {item['id']}", f"Title: {item['title']}"])
+    _print(item)
+    return 0
+
+
+def cmd_tasks_update(args: argparse.Namespace) -> int:
+    updates: dict[str, Any] = {}
+    for key in ["title", "type", "priority", "owner", "status"]:
+        value = getattr(args, key)
+        if value is not None:
+            updates[key] = value
+
+    if args.acceptance is not None:
+        updates["acceptance"] = args.acceptance
+    if args.evidence is not None:
+        updates["evidence"] = args.evidence
+    if args.verification is not None:
+        updates["verification"] = args.verification
+    if args.depends_on is not None:
+        updates["depends_on"] = args.depends_on
+
+    item = update_task(args.id, updates)
+    append_state_event("Task Updated", [f"Task: {item['id']}", f"Status: {item['status']}"])
+    _print(item)
+    return 0
+
+
+def cmd_review_sync(_: argparse.Namespace) -> int:
+    items = sync_review_queue_from_tasks()
+    _print({"items": items, "count": len(items)})
+    return 0
+
+
+def cmd_review_list(_: argparse.Namespace) -> int:
+    _print({"items": load_review_queue()})
+    return 0
+
+
+def _apply_review_action(review_id: str, reviewer: str, action: str, notes: str) -> dict[str, Any]:
+    item = set_review_item_status(review_id, action.lower())
+    task_id = item["task_id"]
+    if action == "Approve":
+        update_task(task_id, {"status": "done"})
+    elif action == "Rework":
+        update_task(task_id, {"status": "blocked"})
+    elif action == "Reject":
+        update_task(task_id, {"status": "blocked"})
+    else:
+        raise ValueError(f"Unsupported review action: {action}")
+
+    append_human_review_log(reviewer, item=review_id, action=action, notes=notes)
+    append_state_event(
+        "Review Action",
+        [
+            f"Review Item: {review_id}",
+            f"Task: {task_id}",
+            f"Action: {action}",
+            f"Reviewer: {reviewer}",
+        ],
+    )
+    task = task_by_id(task_id)
+    return {"review": item, "task": task}
+
+
+def cmd_review_approve(args: argparse.Namespace) -> int:
+    _print(_apply_review_action(args.id, args.reviewer, "Approve", args.notes or ""))
+    return 0
+
+
+def cmd_review_rework(args: argparse.Namespace) -> int:
+    _print(_apply_review_action(args.id, args.reviewer, "Rework", args.notes or ""))
+    return 0
+
+
+def cmd_review_reject(args: argparse.Namespace) -> int:
+    result = _apply_review_action(args.id, args.reviewer, "Reject", args.notes or "")
+
+    rollback_result = None
+    if args.anchor:
+        rollback_result = rollback(anchor_ref=args.anchor, mode="safe")
+        append_state_event(
+            "Reject Cascade Triggered",
+            [
+                f"Review Item: {args.id}",
+                f"Anchor: {args.anchor}",
+                f"Rollback branch: {rollback_result.branch}",
+                f"Reverted commits: {rollback_result.reverted_count}",
+            ],
+        )
+
+    _print({"result": result, "rollback": rollback_result.__dict__ if rollback_result else None})
     return 0
 
 
@@ -122,6 +249,65 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_rollback.set_defaults(func=cmd_rollback)
 
+    p_tasks = sub.add_parser("tasks", help="List/add/update TASKS.yaml")
+    tasks_sub = p_tasks.add_subparsers(dest="tasks_cmd", required=True)
+
+    p_tasks_list = tasks_sub.add_parser("list", help="List tasks")
+    p_tasks_list.set_defaults(func=cmd_tasks_list)
+
+    p_tasks_add = tasks_sub.add_parser("add", help="Add a task")
+    p_tasks_add.add_argument("--title", required=True)
+    p_tasks_add.add_argument("--type", default="code")
+    p_tasks_add.add_argument("--priority", default="P1")
+    p_tasks_add.add_argument("--owner", default="codex")
+    p_tasks_add.add_argument("--status", default="todo")
+    p_tasks_add.add_argument("--acceptance", action="append", default=[])
+    p_tasks_add.add_argument("--evidence", action="append", default=[])
+    p_tasks_add.add_argument("--verification", action="append", default=[])
+    p_tasks_add.add_argument("--depends-on", action="append", default=[])
+    p_tasks_add.set_defaults(func=cmd_tasks_add)
+
+    p_tasks_update = tasks_sub.add_parser("update", help="Update a task")
+    p_tasks_update.add_argument("--id", required=True)
+    p_tasks_update.add_argument("--title")
+    p_tasks_update.add_argument("--type")
+    p_tasks_update.add_argument("--priority")
+    p_tasks_update.add_argument("--owner")
+    p_tasks_update.add_argument("--status")
+    p_tasks_update.add_argument("--acceptance", action="append")
+    p_tasks_update.add_argument("--evidence", action="append")
+    p_tasks_update.add_argument("--verification", action="append")
+    p_tasks_update.add_argument("--depends-on", action="append")
+    p_tasks_update.set_defaults(func=cmd_tasks_update)
+
+    p_review = sub.add_parser("review-queue", help="Sync/list/approve/rework/reject review queue")
+    review_sub = p_review.add_subparsers(dest="review_cmd", required=True)
+
+    p_review_sync = review_sub.add_parser("sync", help="Sync review queue from TASKS waiting_review")
+    p_review_sync.set_defaults(func=cmd_review_sync)
+
+    p_review_list = review_sub.add_parser("list", help="List review queue")
+    p_review_list.set_defaults(func=cmd_review_list)
+
+    p_review_approve = review_sub.add_parser("approve", help="Approve a review item")
+    p_review_approve.add_argument("--id", required=True)
+    p_review_approve.add_argument("--reviewer", default="human")
+    p_review_approve.add_argument("--notes", default="")
+    p_review_approve.set_defaults(func=cmd_review_approve)
+
+    p_review_rework = review_sub.add_parser("rework", help="Request rework for a review item")
+    p_review_rework.add_argument("--id", required=True)
+    p_review_rework.add_argument("--reviewer", default="human")
+    p_review_rework.add_argument("--notes", default="")
+    p_review_rework.set_defaults(func=cmd_review_rework)
+
+    p_review_reject = review_sub.add_parser("reject", help="Reject a review item and optionally trigger rollback")
+    p_review_reject.add_argument("--id", required=True)
+    p_review_reject.add_argument("--reviewer", default="human")
+    p_review_reject.add_argument("--notes", default="")
+    p_review_reject.add_argument("--anchor", help="Rollback anchor tag/commit for cascade restart")
+    p_review_reject.set_defaults(func=cmd_review_reject)
+
     return parser
 
 
@@ -130,8 +316,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.func(args)
-    except Exception as exc:  # pragma: no cover - last-resort CLI handler
-        print(json.dumps({"error": str(exc)}, ensure_ascii=False, indent=2), file=sys.stderr)
+    except Exception as exc:  # pragma: no cover - CLI top-level guard
+        _print({"error": str(exc)})
         return 1
 
 
