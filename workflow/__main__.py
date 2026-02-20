@@ -7,7 +7,9 @@ from typing import Any
 
 from .audit import run_audit
 from .checkpoint import create_checkpoint, list_checkpoints
-from .git_ops import get_status, list_checkpoint_tags
+from .git_ops import fetch, get_status, list_checkpoint_tags, pull_rebase, remote_exists
+from .jobs import list_jobs, start_job, stop_job, tail_job_log
+from .pr_ops import close_superseded_prs, current_pr_context, list_prs, open_pr, update_pr
 from .review_ops import apply_review_action
 from .rollback import HARD_CONFIRM_PHRASE, rollback
 from .state_ops import (
@@ -118,6 +120,17 @@ def cmd_rollback(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_sync(_: argparse.Namespace) -> int:
+    if not remote_exists():
+        _print({"synced": False, "reason": "remote `origin` not configured"})
+        return 0
+    fetch("origin")
+    pull_rebase("origin")
+    append_state_event("Sync Update", ["Operation: git fetch + git pull --rebase", "Remote: origin"])
+    _print({"synced": True, "mode": "fetch+pull --rebase"})
+    return 0
+
+
 def cmd_tasks_list(_: argparse.Namespace) -> int:
     _print({"tasks": load_tasks()})
     return 0
@@ -193,6 +206,74 @@ def cmd_review_reject(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_jobs_start(args: argparse.Namespace) -> int:
+    command = " ".join(args.command)
+    if not command.strip():
+        raise ValueError("jobs start requires a command after `--` or as trailing args.")
+    result = start_job(command=command, workdir=args.workdir)
+    append_state_event("Job Started", [f"Job: {result.id}", f"Command: {result.command}"])
+    _print(result.__dict__)
+    return 0
+
+
+def cmd_jobs_list(_: argparse.Namespace) -> int:
+    _print({"jobs": list_jobs()})
+    return 0
+
+
+def cmd_jobs_stop(args: argparse.Namespace) -> int:
+    item = stop_job(job_id=args.id, force=args.force)
+    append_state_event("Job Stopped", [f"Job: {args.id}", f"Force: {args.force}"])
+    _print(item)
+    return 0
+
+
+def cmd_jobs_logs(args: argparse.Namespace) -> int:
+    _print({"id": args.id, "logs": tail_job_log(args.id, lines=args.lines)})
+    return 0
+
+
+def cmd_pr_open(args: argparse.Namespace) -> int:
+    context = current_pr_context()
+    entry = open_pr(
+        title=args.title,
+        body=args.body,
+        base=args.base,
+        head=args.head,
+        draft=args.draft,
+    )
+    append_state_event(
+        "PR Opened",
+        [
+            f"PR: #{entry['number']}",
+            f"Head: {entry['head_ref']}",
+            f"Base: {entry['base_ref']}",
+            f"Current branch: {context['branch']}",
+        ],
+    )
+    _print(entry)
+    return 0
+
+
+def cmd_pr_update(args: argparse.Namespace) -> int:
+    entry = update_pr(number=args.number, title=args.title, body=args.body, add_comment=args.comment)
+    append_state_event("PR Updated", [f"PR: #{args.number}"])
+    _print(entry)
+    return 0
+
+
+def cmd_pr_list(_: argparse.Namespace) -> int:
+    _print({"prs": list_prs()})
+    return 0
+
+
+def cmd_pr_close_superseded(args: argparse.Namespace) -> int:
+    closed = close_superseded_prs(anchor_ref=args.anchor)
+    append_state_event("PR Close Superseded", [f"Anchor: {args.anchor}", f"Closed PRs: {closed}"])
+    _print({"anchor": args.anchor, "closed_prs": closed})
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m workflow")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -232,6 +313,9 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"Required for hard rollback: {HARD_CONFIRM_PHRASE}",
     )
     p_rollback.set_defaults(func=cmd_rollback)
+
+    p_sync = sub.add_parser("sync", help="Fetch + pull --rebase from origin for cross-device continuity")
+    p_sync.set_defaults(func=cmd_sync)
 
     p_tasks = sub.add_parser("tasks", help="List/add/update TASKS.yaml")
     tasks_sub = p_tasks.add_subparsers(dest="tasks_cmd", required=True)
@@ -291,6 +375,52 @@ def build_parser() -> argparse.ArgumentParser:
     p_review_reject.add_argument("--notes", default="")
     p_review_reject.add_argument("--anchor", help="Rollback anchor tag/commit for cascade restart")
     p_review_reject.set_defaults(func=cmd_review_reject)
+
+    p_jobs = sub.add_parser("jobs", help="Manage local background jobs")
+    jobs_sub = p_jobs.add_subparsers(dest="jobs_cmd", required=True)
+
+    p_jobs_start = jobs_sub.add_parser("start", help="Start a background job")
+    p_jobs_start.add_argument("--workdir", default=None, help="Working directory for command")
+    p_jobs_start.add_argument("command", nargs=argparse.REMAINDER, help="Command to run in background")
+    p_jobs_start.set_defaults(func=cmd_jobs_start)
+
+    p_jobs_list = jobs_sub.add_parser("list", help="List jobs")
+    p_jobs_list.set_defaults(func=cmd_jobs_list)
+
+    p_jobs_stop = jobs_sub.add_parser("stop", help="Stop a running job")
+    p_jobs_stop.add_argument("--id", required=True)
+    p_jobs_stop.add_argument("--force", action="store_true")
+    p_jobs_stop.set_defaults(func=cmd_jobs_stop)
+
+    p_jobs_logs = jobs_sub.add_parser("logs", help="Show latest log lines for a job")
+    p_jobs_logs.add_argument("--id", required=True)
+    p_jobs_logs.add_argument("--lines", type=int, default=80)
+    p_jobs_logs.set_defaults(func=cmd_jobs_logs)
+
+    p_pr = sub.add_parser("pr", help="Open/update/list/close superseded pull requests via gh CLI")
+    pr_sub = p_pr.add_subparsers(dest="pr_cmd", required=True)
+
+    p_pr_open = pr_sub.add_parser("open", help="Open PR from current branch")
+    p_pr_open.add_argument("--title", required=True)
+    p_pr_open.add_argument("--body", required=True)
+    p_pr_open.add_argument("--base")
+    p_pr_open.add_argument("--head")
+    p_pr_open.add_argument("--draft", action="store_true")
+    p_pr_open.set_defaults(func=cmd_pr_open)
+
+    p_pr_update = pr_sub.add_parser("update", help="Update PR title/body/comment")
+    p_pr_update.add_argument("--number", type=int, required=True)
+    p_pr_update.add_argument("--title")
+    p_pr_update.add_argument("--body")
+    p_pr_update.add_argument("--comment")
+    p_pr_update.set_defaults(func=cmd_pr_update)
+
+    p_pr_list = pr_sub.add_parser("list", help="List PRs tracked by workflow registry")
+    p_pr_list.set_defaults(func=cmd_pr_list)
+
+    p_pr_close = pr_sub.add_parser("close-superseded", help="Close open PRs superseded by rollback anchor")
+    p_pr_close.add_argument("--anchor", required=True)
+    p_pr_close.set_defaults(func=cmd_pr_close_superseded)
 
     return parser
 
