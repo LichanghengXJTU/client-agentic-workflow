@@ -1,0 +1,5 @@
+PyYAML>=6.0
+pytest>=8.0
+streamlit>=1.40
+sympy>=1.13
+openai>=1.0.0

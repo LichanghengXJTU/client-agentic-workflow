@@ -171,3 +171,21 @@ def process_exists(pid: int) -> bool:
         return True
     else:
         return True
+
+
+def is_ancestor(ancestor: str, descendant: str, cwd: str | Path | None = None) -> bool:
+    proc = run_cmd(["git", "merge-base", "--is-ancestor", ancestor, descendant], cwd=cwd)
+    return proc.returncode == 0
+
+
+def detect_default_base_branch(cwd: str | Path | None = None) -> str:
+    proc = run_cmd(["git", "symbolic-ref", "refs/remotes/origin/HEAD"], cwd=cwd)
+    if proc.returncode == 0 and proc.stdout.strip():
+        ref = proc.stdout.strip()
+        if "/" in ref:
+            return ref.rsplit("/", maxsplit=1)[-1]
+    for candidate in ["main", "master", "develop"]:
+        check = run_cmd(["git", "show-ref", "--verify", f"refs/heads/{candidate}"], cwd=cwd)
+        if check.returncode == 0:
+            return candidate
+    return "main"

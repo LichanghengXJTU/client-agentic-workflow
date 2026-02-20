@@ -8,16 +8,14 @@ from typing import Any
 from .audit import run_audit
 from .checkpoint import create_checkpoint, list_checkpoints
 from .git_ops import get_status, list_checkpoint_tags
+from .review_ops import apply_review_action
 from .rollback import HARD_CONFIRM_PHRASE, rollback
 from .state_ops import (
     add_task,
-    append_human_review_log,
     append_state_event,
     load_review_queue,
     load_tasks,
-    set_review_item_status,
     sync_review_queue_from_tasks,
-    task_by_id,
     update_task,
 )
 from .verify import run_verify
@@ -175,59 +173,23 @@ def cmd_review_list(_: argparse.Namespace) -> int:
     return 0
 
 
-def _apply_review_action(review_id: str, reviewer: str, action: str, notes: str) -> dict[str, Any]:
-    item = set_review_item_status(review_id, action.lower())
-    task_id = item["task_id"]
-    if action == "Approve":
-        update_task(task_id, {"status": "done"})
-    elif action == "Rework":
-        update_task(task_id, {"status": "blocked"})
-    elif action == "Reject":
-        update_task(task_id, {"status": "blocked"})
-    else:
-        raise ValueError(f"Unsupported review action: {action}")
-
-    append_human_review_log(reviewer, item=review_id, action=action, notes=notes)
-    append_state_event(
-        "Review Action",
-        [
-            f"Review Item: {review_id}",
-            f"Task: {task_id}",
-            f"Action: {action}",
-            f"Reviewer: {reviewer}",
-        ],
-    )
-    task = task_by_id(task_id)
-    return {"review": item, "task": task}
-
-
 def cmd_review_approve(args: argparse.Namespace) -> int:
-    _print(_apply_review_action(args.id, args.reviewer, "Approve", args.notes or ""))
+    result = apply_review_action(args.id, args.reviewer, "Approve", args.notes or "")
+    _print(result.__dict__)
     return 0
 
 
 def cmd_review_rework(args: argparse.Namespace) -> int:
-    _print(_apply_review_action(args.id, args.reviewer, "Rework", args.notes or ""))
+    result = apply_review_action(args.id, args.reviewer, "Rework", args.notes or "")
+    _print(result.__dict__)
     return 0
 
 
 def cmd_review_reject(args: argparse.Namespace) -> int:
-    result = _apply_review_action(args.id, args.reviewer, "Reject", args.notes or "")
-
-    rollback_result = None
-    if args.anchor:
-        rollback_result = rollback(anchor_ref=args.anchor, mode="safe")
-        append_state_event(
-            "Reject Cascade Triggered",
-            [
-                f"Review Item: {args.id}",
-                f"Anchor: {args.anchor}",
-                f"Rollback branch: {rollback_result.branch}",
-                f"Reverted commits: {rollback_result.reverted_count}",
-            ],
-        )
-
-    _print({"result": result, "rollback": rollback_result.__dict__ if rollback_result else None})
+    if not args.anchor:
+        raise ValueError("Reject requires --anchor to trigger cascade restart from a checkpoint/commit.")
+    result = apply_review_action(args.id, args.reviewer, "Reject", args.notes or "", anchor=args.anchor)
+    _print(result.__dict__)
     return 0
 
 
