@@ -1,0 +1,11 @@
+projects:
+- id: P-0001
+  slug: rl-gridworld-qlearning
+  title: RL Gridworld Q-learning
+  local_path: projects/rl-gridworld-qlearning
+  release_repo: LichanghengXJTU/rl-gridworld-qlearning-release
+  release_visibility: public
+  release_default_branch: main
+  status: active
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'

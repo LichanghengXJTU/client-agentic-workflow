@@ -12,6 +12,8 @@ from .checkpoint import create_checkpoint, list_checkpoints
 from .git_ops import fetch, get_status, list_checkpoint_tags, pull_rebase, remote_exists
 from .jobs import list_jobs, start_job, stop_job, tail_job_log
 from .pr_ops import close_superseded_prs, current_pr_context, list_prs, open_pr, update_pr
+from .project_ops import add_project, list_projects, scaffold_project, update_project as update_project_record
+from .release_ops import bootstrap_release_repo, open_release_pr, publish_project_release
 from .review_ops import apply_review_action
 from .rollback import HARD_CONFIRM_PHRASE, rollback
 from .state_ops import (
@@ -277,6 +279,103 @@ def cmd_pr_close_superseded(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_project_list(_: argparse.Namespace) -> int:
+    _print({"projects": list_projects()})
+    return 0
+
+
+def cmd_project_add(args: argparse.Namespace) -> int:
+    item = add_project(
+        slug=args.slug,
+        title=args.title,
+        local_path=args.local_path,
+        release_repo=args.release_repo,
+        release_visibility=args.release_visibility,
+        release_default_branch=args.release_default_branch,
+        status=args.status,
+    )
+    append_state_event("Project Added", [f"Project: {item['slug']}", f"Release repo: {item['release_repo']}"])
+    _print(item)
+    return 0
+
+
+def cmd_project_update(args: argparse.Namespace) -> int:
+    updates: dict[str, Any] = {}
+    for key in ["title", "local_path", "release_repo", "release_visibility", "release_default_branch", "status"]:
+        value = getattr(args, key)
+        if value is not None:
+            updates[key] = value
+    item = update_project_record(args.slug, updates=updates)
+    append_state_event("Project Updated", [f"Project: {item['slug']}", f"Status: {item['status']}"])
+    _print(item)
+    return 0
+
+
+def cmd_project_scaffold(args: argparse.Namespace) -> int:
+    root = scaffold_project(slug=args.slug, title=args.title, base_dir=args.base_dir)
+    append_state_event("Project Scaffold", [f"Project: {args.slug}", f"Path: {root}"])
+    _print({"slug": args.slug, "path": str(root)})
+    return 0
+
+
+def cmd_release_bootstrap(args: argparse.Namespace) -> int:
+    result = bootstrap_release_repo(
+        project_slug=args.project,
+        visibility=args.visibility,
+        default_branch=args.default_branch,
+        release_repo=args.release_repo,
+    )
+    append_state_event(
+        "Release Bootstrap",
+        [
+            f"Project: {result.project}",
+            f"Release repo: {result.release_repo}",
+            f"Created: {result.created}",
+            f"Visibility: {result.visibility}",
+        ],
+    )
+    _print(result.__dict__)
+    return 0
+
+
+def cmd_release_publish(args: argparse.Namespace) -> int:
+    result = publish_project_release(project_slug=args.project)
+    append_state_event(
+        "Release Publish",
+        [
+            f"Project: {result.project}",
+            f"Release repo: {result.release_repo}",
+            f"Branch: {result.branch}",
+            f"Source head: {result.source_head}",
+            f"Release head: {result.release_head}",
+            f"Changed files: {result.changed_files}",
+        ],
+    )
+    _print(result.__dict__)
+    return 0
+
+
+def cmd_release_pr(args: argparse.Namespace) -> int:
+    result = open_release_pr(
+        project_slug=args.project,
+        title=args.title,
+        body=args.body,
+        base=args.base,
+        head=args.head,
+    )
+    append_state_event(
+        "Release PR Opened",
+        [
+            f"Project: {result.project}",
+            f"Release repo: {result.release_repo}",
+            f"PR: #{result.number}",
+            f"URL: {result.url}",
+        ],
+    )
+    _print(result.__dict__)
+    return 0
+
+
 def _read_optional_file(path: str | None) -> str:
     if not path:
         return ""
@@ -483,6 +582,60 @@ def build_parser() -> argparse.ArgumentParser:
     p_pr_close = pr_sub.add_parser("close-superseded", help="Close open PRs superseded by rollback anchor")
     p_pr_close.add_argument("--anchor", required=True)
     p_pr_close.set_defaults(func=cmd_pr_close_superseded)
+
+    p_project = sub.add_parser("project", help="Manage multi-project registry and local scaffolds")
+    project_sub = p_project.add_subparsers(dest="project_cmd", required=True)
+
+    p_project_list = project_sub.add_parser("list", help="List projects from PROJECT_REGISTRY")
+    p_project_list.set_defaults(func=cmd_project_list)
+
+    p_project_add = project_sub.add_parser("add", help="Register a project")
+    p_project_add.add_argument("--slug", required=True)
+    p_project_add.add_argument("--title", required=True)
+    p_project_add.add_argument("--local-path", required=True)
+    p_project_add.add_argument("--release-repo", required=True)
+    p_project_add.add_argument("--release-visibility", default="public")
+    p_project_add.add_argument("--release-default-branch", default="main")
+    p_project_add.add_argument("--status", default="active")
+    p_project_add.set_defaults(func=cmd_project_add)
+
+    p_project_update = project_sub.add_parser("update", help="Update a project by slug")
+    p_project_update.add_argument("--slug", required=True)
+    p_project_update.add_argument("--title")
+    p_project_update.add_argument("--local-path")
+    p_project_update.add_argument("--release-repo")
+    p_project_update.add_argument("--release-visibility")
+    p_project_update.add_argument("--release-default-branch")
+    p_project_update.add_argument("--status")
+    p_project_update.set_defaults(func=cmd_project_update)
+
+    p_project_scaffold = project_sub.add_parser("scaffold", help="Create project directory scaffold and prompt templates")
+    p_project_scaffold.add_argument("--slug", required=True)
+    p_project_scaffold.add_argument("--title", required=True)
+    p_project_scaffold.add_argument("--base-dir", default="projects")
+    p_project_scaffold.set_defaults(func=cmd_project_scaffold)
+
+    p_release = sub.add_parser("release", help="Cross-repo release automation for project exports")
+    release_sub = p_release.add_subparsers(dest="release_cmd", required=True)
+
+    p_release_bootstrap = release_sub.add_parser("bootstrap", help="Create/bind release repository for a project")
+    p_release_bootstrap.add_argument("--project", required=True)
+    p_release_bootstrap.add_argument("--visibility", choices=["public", "private", "internal"], default="public")
+    p_release_bootstrap.add_argument("--default-branch", default="main")
+    p_release_bootstrap.add_argument("--release-repo")
+    p_release_bootstrap.set_defaults(func=cmd_release_bootstrap)
+
+    p_release_publish = release_sub.add_parser("publish", help="Export project directory and push sync branch")
+    p_release_publish.add_argument("--project", required=True)
+    p_release_publish.set_defaults(func=cmd_release_publish)
+
+    p_release_pr = release_sub.add_parser("pr", help="Open PR in release repository")
+    p_release_pr.add_argument("--project", required=True)
+    p_release_pr.add_argument("--title", required=True)
+    p_release_pr.add_argument("--body", required=True)
+    p_release_pr.add_argument("--base")
+    p_release_pr.add_argument("--head")
+    p_release_pr.set_defaults(func=cmd_release_pr)
 
     p_ai = sub.add_parser("ai", help="AI-assisted plan/audit with budget guardrails")
     ai_sub = p_ai.add_subparsers(dest="ai_cmd", required=True)

@@ -40,6 +40,13 @@ def _discover_derivation_checks(root: Path) -> list[Path]:
     return sorted(root.rglob("*_check.py"))
 
 
+def _discover_project_derivation_checks(root: Path) -> list[Path]:
+    projects_root = root / "projects"
+    if not projects_root.exists():
+        return []
+    return sorted(projects_root.rglob("derivations/*_check.py"))
+
+
 def run_verify(cwd: str | Path | None = None) -> VerifyResult:
     root = Path(cwd) if cwd else Path.cwd()
     steps: list[VerifyStep] = []
@@ -59,6 +66,9 @@ def run_verify(cwd: str | Path | None = None) -> VerifyResult:
         )
 
     for script in _discover_derivation_checks(root / "derivations"):
+        steps.append(_run([sys.executable, str(script)], cwd=root))
+
+    for script in _discover_project_derivation_checks(root):
         steps.append(_run([sys.executable, str(script)], cwd=root))
 
     ok = all(step.returncode == 0 for step in steps)

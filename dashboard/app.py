@@ -2,9 +2,15 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
+import sys
 
 import streamlit as st
 import yaml
+
+# Streamlit executes apps as scripts, so the project root may not be on sys.path.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from dashboard.components import git_write_guard, section_header, status_badge
 from workflow.ai import run_ai_audit, run_ai_plan

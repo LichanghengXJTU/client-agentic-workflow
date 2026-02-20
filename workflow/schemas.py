@@ -11,10 +11,15 @@ TASK_STATUS_SET = {"todo", "in_progress", "waiting_review", "done", "blocked"}
 
 KR_STATUS_SET = {"proposed", "verified", "deprecated"}
 CONFIDENCE_SET = {"low", "medium", "high"}
+PROJECT_STATUS_SET = {"active", "archived", "draft"}
+VISIBILITY_SET = {"public", "private", "internal"}
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 TASK_ID_RE = re.compile(r"^T-\d{4}$")
 KR_ID_RE = re.compile(r"^KR-\d{4}$")
+PROJECT_ID_RE = re.compile(r"^P-\d{4}$")
+SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 
 
 @dataclass
@@ -283,6 +288,148 @@ def validate_key_results_data(data: dict[str, Any]) -> tuple[bool, list[Validati
                         path=f"{base}.{key}",
                         message=f"`{key}` must be non-empty commit hash/ref string.",
                         suggestion=f"Set `{key}` to a commit hash (or `TBD` temporarily).",
+                    )
+                )
+
+    return len(issues) == 0, issues
+
+
+def validate_project_registry_data(data: dict[str, Any]) -> tuple[bool, list[ValidationIssue]]:
+    issues: list[ValidationIssue] = []
+    projects = data.get("projects")
+    if not isinstance(projects, list):
+        issues.append(
+            ValidationIssue(
+                path="projects",
+                message="`projects` must be a list.",
+                suggestion="Set top-level key as `projects: []`.",
+            )
+        )
+        return False, issues
+
+    seen_ids: set[str] = set()
+    seen_slugs: set[str] = set()
+    for idx, item in enumerate(projects):
+        base = f"projects[{idx}]"
+        if not isinstance(item, dict):
+            issues.append(
+                ValidationIssue(
+                    path=base,
+                    message="Each project item must be a mapping.",
+                    suggestion="Use YAML mapping with required project registry fields.",
+                )
+            )
+            continue
+
+        required = [
+            "id",
+            "slug",
+            "title",
+            "local_path",
+            "release_repo",
+            "release_visibility",
+            "release_default_branch",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+        for key in required:
+            if key not in item:
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.{key}",
+                        message=f"Missing required field `{key}`.",
+                        suggestion=f"Add `{key}` according to docs/DATA_MODEL.md.",
+                    )
+                )
+
+        project_id = item.get("id")
+        if not isinstance(project_id, str) or not PROJECT_ID_RE.match(project_id):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.id",
+                    message="Project id must match pattern `P-0001`.",
+                    suggestion="Rename id to `P-` + 4 digits.",
+                )
+            )
+        elif project_id in seen_ids:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.id",
+                    message=f"Duplicate project id `{project_id}`.",
+                    suggestion="Ensure each project id is unique.",
+                )
+            )
+        else:
+            seen_ids.add(project_id)
+
+        slug = item.get("slug")
+        if not isinstance(slug, str) or not SLUG_RE.match(slug):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.slug",
+                    message="Project slug must match `[a-z0-9-]+`.",
+                    suggestion="Use lowercase slug like `rl-gridworld-qlearning`.",
+                )
+            )
+        elif slug in seen_slugs:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.slug",
+                    message=f"Duplicate project slug `{slug}`.",
+                    suggestion="Ensure each project slug is unique.",
+                )
+            )
+        else:
+            seen_slugs.add(slug)
+
+        for key in ["title", "local_path", "release_default_branch"]:
+            value = item.get(key)
+            if not isinstance(value, str) or not value.strip():
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.{key}",
+                        message=f"`{key}` must be a non-empty string.",
+                        suggestion=f"Provide `{key}` with a valid value.",
+                    )
+                )
+
+        release_repo = item.get("release_repo")
+        if not isinstance(release_repo, str) or not REPO_RE.match(release_repo):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.release_repo",
+                    message="`release_repo` must match `owner/name`.",
+                    suggestion="Set release_repo like `LichanghengXJTU/rl-gridworld-qlearning-release`.",
+                )
+            )
+
+        if item.get("release_visibility") not in VISIBILITY_SET:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.release_visibility",
+                    message=f"release_visibility must be one of {sorted(VISIBILITY_SET)}.",
+                    suggestion="Use public/private/internal.",
+                )
+            )
+
+        if item.get("status") not in PROJECT_STATUS_SET:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.status",
+                    message=f"status must be one of {sorted(PROJECT_STATUS_SET)}.",
+                    suggestion="Use active/archived/draft.",
+                )
+            )
+
+        for key in ["created_at", "updated_at"]:
+            value = item.get(key)
+            if not isinstance(value, str) or not DATE_RE.match(value):
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.{key}",
+                        message=f"`{key}` must be YYYY-MM-DD.",
+                        suggestion=f"Set `{key}` like `2026-02-21`.",
                     )
                 )
 

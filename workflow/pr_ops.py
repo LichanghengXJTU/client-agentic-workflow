@@ -26,18 +26,43 @@ def _save_registry(items: list[dict[str, Any]], path: Path = PR_REGISTRY_PATH) -
     atomic_write_yaml(path, {"prs": items})
 
 
+def _repo_from_remote(cwd: str | Path | None = None) -> str:
+    proc = subprocess.run(["git", "remote", "get-url", "origin"], cwd=cwd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        return ""
+    remote = proc.stdout.strip()
+    if remote.startswith("git@github.com:"):
+        payload = remote.split("git@github.com:", maxsplit=1)[1]
+        return payload.removesuffix(".git")
+    if remote.startswith("https://github.com/"):
+        payload = remote.split("https://github.com/", maxsplit=1)[1]
+        return payload.removesuffix(".git")
+    return ""
+
+
 def _upsert_registry(entry: dict[str, Any], path: Path = PR_REGISTRY_PATH) -> None:
     prs = _load_registry(path)
     number = int(entry["number"])
+    repo = str(entry.get("repo", ""))
+    role = str(entry.get("role", "source"))
     found = False
     for item in prs:
-        if int(item.get("number", -1)) == number:
+        item_number = int(item.get("number", -1))
+        item_repo = str(item.get("repo", ""))
+        item_role = str(item.get("role", "source"))
+        same_key = item_number == number and item_repo == repo and item_role == role
+        legacy_key = item_number == number and role == "source" and not item_repo
+        if same_key or legacy_key:
             item.update(entry)
             found = True
             break
     if not found:
         prs.append(entry)
     _save_registry(prs, path)
+
+
+def upsert_pr_registry(entry: dict[str, Any], path: Path = PR_REGISTRY_PATH) -> None:
+    _upsert_registry(entry, path=path)
 
 
 def open_pr(
@@ -82,6 +107,7 @@ def open_pr(
         )
     )
 
+    repo = _repo_from_remote(cwd=cwd)
     entry = {
         "number": view["number"],
         "title": view["title"],
@@ -90,6 +116,8 @@ def open_pr(
         "head_ref": view["headRefName"],
         "base_ref": view["baseRefName"],
         "head_sha": view["headRefOid"],
+        "repo": repo,
+        "role": "source",
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "updated_at": datetime.now().isoformat(timespec="seconds"),
     }
@@ -127,6 +155,7 @@ def update_pr(
             cwd=cwd,
         )
     )
+    repo = _repo_from_remote(cwd=cwd)
     entry = {
         "number": view["number"],
         "title": view["title"],
@@ -135,6 +164,8 @@ def update_pr(
         "head_ref": view["headRefName"],
         "base_ref": view["baseRefName"],
         "head_sha": view["headRefOid"],
+        "repo": repo,
+        "role": "source",
         "updated_at": datetime.now().isoformat(timespec="seconds"),
     }
     _upsert_registry(entry)
@@ -164,10 +195,11 @@ def close_superseded_prs(anchor_ref: str, cwd: str | Path | None = None) -> list
     prs = _load_registry()
     for item in prs:
         number = int(item.get("number", -1))
+        role = str(item.get("role", "source"))
         state = str(item.get("state", "")).upper()
         head_sha = item.get("head_sha", "")
 
-        if state != "OPEN" or not head_sha:
+        if role != "source" or state != "OPEN" or not head_sha:
             continue
         try:
             if is_ancestor(anchor_ref, head_sha, cwd=cwd):

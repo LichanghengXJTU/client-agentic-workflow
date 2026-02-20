@@ -5,6 +5,18 @@ prs:
   url: https://github.com/LichanghengXJTU/client-agentic-workflow/pull/1
   head_ref: bootstrap/agentic-workflow
   base_ref: main
-  head_sha: 38e3459769bb457f5b20825f9dc1a2083dfdf29c
+  head_sha: 7f47818b06956086a30a457ee1b2aab283f385c1
   created_at: '2026-02-21T00:54:32'
-  updated_at: '2026-02-21T00:55:58'
+  updated_at: '2026-02-21T03:14:25'
+  repo: LichanghengXJTU/client-agentic-workflow
+  role: source
+- number: 1
+  title: 'release: rl-gridworld-qlearning initial sync'
+  state: OPEN
+  url: https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release/pull/1
+  head_ref: sync/20260221-0313-7f47818b
+  base_ref: main
+  head_sha: 10448a64e7aa8677272da5f9011f251066df4ae3
+  repo: LichanghengXJTU/rl-gridworld-qlearning-release
+  role: release
+  updated_at: '2026-02-21T03:13:40'

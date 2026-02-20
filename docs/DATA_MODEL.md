@@ -48,12 +48,29 @@ items:
 prs:
   - number: 12
     state: "OPEN|CLOSED|MERGED"
+    role: "source|release"
+    repo: "owner/repo"
     head_ref: "bootstrap/agentic-workflow"
     base_ref: "main"
     head_sha: "..."
     url: "https://github.com/..."
     created_at: "..."
     updated_at: "..."
+```
+
+## PROJECT_REGISTRY.yaml
+```yaml
+projects:
+  - id: "P-0001"
+    slug: "rl-gridworld-qlearning"
+    title: "RL Gridworld Q-learning"
+    local_path: "projects/rl-gridworld-qlearning"
+    release_repo: "LichanghengXJTU/rl-gridworld-qlearning-release"
+    release_visibility: "public|private|internal"
+    release_default_branch: "main"
+    status: "active|archived|draft"
+    created_at: "YYYY-MM-DD"
+    updated_at: "YYYY-MM-DD"
 ```
 
 ## JOBS.yaml

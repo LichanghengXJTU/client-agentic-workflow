@@ -29,6 +29,28 @@ python3 -m workflow review-queue reject --id RQ-0001 --anchor cp-20260220-1200-d
 ```
 Reject 会触发安全级联重启（rollback 分支 + revert + 任务重置 + 关闭 superseded PR）。
 
+## 4.5 项目注册（Project Registry）
+```bash
+python3 -m workflow project list
+python3 -m workflow project scaffold --slug rl-gridworld-qlearning --title "RL Gridworld Q-learning"
+python3 -m workflow project add --slug rl-gridworld-qlearning --title "RL Gridworld Q-learning" \
+  --local-path projects/rl-gridworld-qlearning \
+  --release-repo LichanghengXJTU/rl-gridworld-qlearning-release \
+  --release-visibility public --release-default-branch main --status active
+python3 -m workflow project update --slug rl-gridworld-qlearning --status archived
+```
+
+## 4.6 跨库发布（Release Automation）
+```bash
+python3 -m workflow release bootstrap --project rl-gridworld-qlearning --visibility public
+python3 -m workflow release publish --project rl-gridworld-qlearning
+python3 -m workflow release pr --project rl-gridworld-qlearning \
+  --title "release: rl-gridworld-qlearning sync" --body "sync from source repo"
+```
+说明：
+- `release publish` 仅导出项目目录 `projects/<slug>/`，不会发布整个源仓库。
+- 发布 PR 会记录到 `state/PR_REGISTRY.yaml`，并标记 `role: release`。
+
 ## 5. 验证与审计
 ```bash
 python3 -m workflow verify

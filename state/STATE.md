@@ -72,3 +72,153 @@
 
 ## PR Updated
 - PR: #1
+
+## Dashboard Import Hotfix (2026-02-21)
+- Symptom: `streamlit run dashboard/app.py` raised `ModuleNotFoundError: No module named 'dashboard'` in script execution mode.
+- Root cause: Streamlit script execution did not reliably include repository root on `sys.path`, so package-style imports (`dashboard.*`, `workflow.*`) were unresolved.
+- Fix: Added explicit project-root `sys.path` bootstrap in `dashboard/app.py` before internal imports.
+- Verification:
+  - `python -m pytest -q tests/test_dashboard_smoke.py` (pass)
+  - `python -m workflow verify` (pass, report: `artifacts/test/verify-20260221-0202.md`)
+  - `streamlit run dashboard/app.py --server.headless true` (starts without import error)
+
+## Project Scaffold
+- Project: rl-gridworld-qlearning
+- Path: projects/rl-gridworld-qlearning
+
+## Project Added
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+
+## Task Added
+- Task: T-0010
+- Title: [RL-001] Project scaffold and prompt templates
+
+## Task Added
+- Task: T-0011
+- Title: [RL-002] Implement deterministic Gridworld Q-learning
+
+## Task Added
+- Task: T-0012
+- Title: [RL-003] Verify and audit coverage for RL project
+
+## Task Added
+- Task: T-0013
+- Title: [RL-004] Release automation bootstrap/publish/pr
+
+## Task Added
+- Task: T-0014
+- Title: [RL-005] Final review and closure checklist
+
+## Task Updated
+- Task: T-0010
+- Status: done
+
+## Task Updated
+- Task: T-0011
+- Status: in_progress
+
+## Task Updated
+- Task: T-0011
+- Status: done
+
+## Task Updated
+- Task: T-0012
+- Status: in_progress
+
+## Task Updated
+- Task: T-0013
+- Status: in_progress
+
+## Release Bootstrap
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+- Created: True
+- Visibility: public
+
+## Release Publish
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+- Branch: sync/20260221-0311-7f47818b
+- Source head: 7f47818b06956086a30a457ee1b2aab283f385c1
+- Release head: c951b3126555666b0e6f74cb85f0818d672fe628
+- Changed files: 10
+
+## Release Bootstrap
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+- Created: False
+- Visibility: public
+
+## Release Publish
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+- Branch: sync/20260221-0312-7f47818b
+- Source head: 7f47818b06956086a30a457ee1b2aab283f385c1
+- Release head: c951b3126555666b0e6f74cb85f0818d672fe628
+- Changed files: 0
+
+## Release Publish
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+- Branch: sync/20260221-0313-7f47818b
+- Source head: 7f47818b06956086a30a457ee1b2aab283f385c1
+- Release head: 10448a64e7aa8677272da5f9011f251066df4ae3
+- Changed files: 1
+
+## Release PR Opened
+- Project: rl-gridworld-qlearning
+- Release repo: LichanghengXJTU/rl-gridworld-qlearning-release
+- PR: #1
+- URL: https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release/pull/1
+
+## Task Updated
+- Task: T-0012
+- Status: done
+
+## Task Updated
+- Task: T-0013
+- Status: done
+
+## Task Updated
+- Task: T-0014
+- Status: in_progress
+
+## PR Updated
+- PR: #1
+
+## Task Updated
+- Task: T-0014
+- Status: waiting_review
+
+## Review Action
+- Review Item: RQ-0009
+- Task: T-0009
+- Action: Approve
+- Reviewer: human
+- Anchor: -
+- Rollback branch: -
+- Closed PRs: []
+
+## Review Action
+- Review Item: RQ-0010
+- Task: T-0014
+- Action: Approve
+- Reviewer: human
+- Anchor: -
+- Rollback branch: -
+- Closed PRs: []
+
+## AI Plan
+- Model: gpt-5
+- Output: state/PLAN.md
+- Budget spend USD: 0.12767
+- Budget ratio: 0.000
+- Message: ok
+
+## AI Audit
+- Model: gpt-5
+- Output: artifacts/audit/ai-20260221-0316.md
+- Budget spend USD: 0.29784
+- Budget ratio: 0.000
+- Message: ok

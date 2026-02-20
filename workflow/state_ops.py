@@ -17,6 +17,7 @@ PR_REGISTRY_PATH = STATE_DIR / "PR_REGISTRY.yaml"
 JOBS_PATH = STATE_DIR / "JOBS.yaml"
 AI_CONFIG_PATH = STATE_DIR / "AI_CONFIG.yaml"
 AI_BUDGET_PATH = STATE_DIR / "AI_BUDGET.yaml"
+PROJECT_REGISTRY_PATH = STATE_DIR / "PROJECT_REGISTRY.yaml"
 
 
 def now_iso() -> str:
@@ -213,6 +214,15 @@ def save_key_results(results: list[dict[str, Any]], path: str | Path = KEY_RESUL
     atomic_write_yaml(path, {"results": results})
 
 
+def load_project_registry(path: str | Path = PROJECT_REGISTRY_PATH) -> list[dict[str, Any]]:
+    data = read_yaml(path)
+    return data.get("projects", [])
+
+
+def save_project_registry(items: list[dict[str, Any]], path: str | Path = PROJECT_REGISTRY_PATH) -> None:
+    atomic_write_yaml(path, {"projects": items})
+
+
 def ensure_minimum_state_files() -> None:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     defaults: list[tuple[Path, dict[str, Any]]] = [
@@ -220,6 +230,7 @@ def ensure_minimum_state_files() -> None:
         (REVIEW_QUEUE_PATH, {"items": []}),
         (KEY_RESULTS_PATH, {"results": []}),
         (PR_REGISTRY_PATH, {"prs": []}),
+        (PROJECT_REGISTRY_PATH, {"projects": []}),
         (JOBS_PATH, {"jobs": []}),
         (
             AI_BUDGET_PATH,

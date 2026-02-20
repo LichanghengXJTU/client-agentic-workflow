@@ -1,173 +1,267 @@
 tasks:
-  - id: "T-0001"
-    title: "初始化仓库与工作流骨架"
-    type: "meta"
-    priority: "P0"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "仓库初始化并使用 bootstrap/agentic-workflow 分支"
-      - "目录骨架与基础文件已创建"
-    evidence:
-      - "state/STATE.md"
-      - "AGENTS.md"
-    verification:
-      - "python -m workflow status"
-    depends_on: []
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0002"
-    title: "实现 checkpoint 与 safe rollback"
-    type: "code"
-    priority: "P0"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "checkpoint 可创建 tag 与记录"
-      - "safe rollback 创建 rollback 分支并 revert"
-    evidence:
-      - "workflow/checkpoint.py"
-      - "workflow/rollback.py"
-      - "tests/test_checkpoint_rollback.py"
-    verification:
-      - "python -m pytest -q tests/test_checkpoint_rollback.py"
-    depends_on:
-      - "T-0001"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0003"
-    title: "实现 TASKS/KEY_RESULTS schema 与 review queue"
-    type: "code"
-    priority: "P0"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "tasks 与 key results schema 可校验"
-      - "review-queue 支持 approve/rework/reject"
-    evidence:
-      - "workflow/schemas.py"
-      - "workflow/review_ops.py"
-    verification:
-      - "python -m pytest -q tests/test_state_schema.py tests/test_review_queue_flow.py"
-    depends_on:
-      - "T-0001"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0004"
-    title: "实现 verify/audit 审计验证流水线"
-    type: "code"
-    priority: "P0"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "verify 生成测试报告"
-      - "audit 输出 P0/P1/P2 与修复建议"
-    evidence:
-      - "workflow/verify.py"
-      - "workflow/audit.py"
-    verification:
-      - "python -m workflow verify"
-      - "python -m workflow audit"
-    depends_on:
-      - "T-0003"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0005"
-    title: "实现 Streamlit dashboard 六页签"
-    type: "code"
-    priority: "P1"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "Overview/Tasks/Review Queue/Checkpoints/Audit&Verify/Jobs&AI 可打开"
-      - "git 写历史操作前需确认"
-    evidence:
-      - "dashboard/app.py"
-      - "dashboard/components.py"
-    verification:
-      - "streamlit run dashboard/app.py"
-    depends_on:
-      - "T-0004"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0006"
-    title: "实现自动 PR 与 reject 级联重启"
-    type: "code"
-    priority: "P0"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "pr open/update/list/close-superseded 可运行"
-      - "reject 可触发 rollback + 任务重置 + PR 关闭"
-    evidence:
-      - "workflow/pr_ops.py"
-      - "workflow/review_ops.py"
-      - "tests/test_reject_cascade.py"
-    verification:
-      - "python -m pytest -q tests/test_reject_cascade.py"
-    depends_on:
-      - "T-0003"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0007"
-    title: "实现 AI plan/audit 与预算守卫"
-    type: "code"
-    priority: "P1"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "ai plan/audit 在无 key 时落盘 pending 报告"
-      - "80%预警与100%降级策略可触发"
-    evidence:
-      - "workflow/ai.py"
-      - "state/AI_BUDGET.yaml"
-      - "tests/test_ai_budget.py"
-    verification:
-      - "python -m pytest -q tests/test_ai_budget.py"
-    depends_on:
-      - "T-0004"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0008"
-    title: "补齐文档与 GitHub Actions 模板"
-    type: "writing"
-    priority: "P1"
-    owner: "codex"
-    status: "done"
-    acceptance:
-      - "WORKFLOW/DATA_MODEL/GOVERNANCE/AI_PROMPTS 文档完善"
-      - "ci/audit/codex-review workflow 模板可用"
-    evidence:
-      - "docs/WORKFLOW.md"
-      - ".github/workflows/ci.yml"
-    verification:
-      - "python -m workflow audit"
-    depends_on:
-      - "T-0004"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
-
-  - id: "T-0009"
-    title: "人类最终审查与首次真实项目启动"
-    type: "meta"
-    priority: "P1"
-    owner: "human"
-    status: "waiting_review"
-    acceptance:
-      - "审阅 Reviewer Brief 并确认回滚策略"
-      - "创建首个研究任务并进入 daily loop"
-    evidence:
-      - "artifacts/audit/pr-ready-brief.md"
-    verification:
-      - "python -m workflow review-queue sync"
-    depends_on:
-      - "T-0008"
-    created_at: "2026-02-20"
-    updated_at: "2026-02-21"
+- id: T-0001
+  title: 初始化仓库与工作流骨架
+  type: meta
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - 仓库初始化并使用 bootstrap/agentic-workflow 分支
+  - 目录骨架与基础文件已创建
+  evidence:
+  - state/STATE.md
+  - AGENTS.md
+  verification:
+  - python -m workflow status
+  depends_on: []
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0002
+  title: 实现 checkpoint 与 safe rollback
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - checkpoint 可创建 tag 与记录
+  - safe rollback 创建 rollback 分支并 revert
+  evidence:
+  - workflow/checkpoint.py
+  - workflow/rollback.py
+  - tests/test_checkpoint_rollback.py
+  verification:
+  - python -m pytest -q tests/test_checkpoint_rollback.py
+  depends_on:
+  - T-0001
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0003
+  title: 实现 TASKS/KEY_RESULTS schema 与 review queue
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - tasks 与 key results schema 可校验
+  - review-queue 支持 approve/rework/reject
+  evidence:
+  - workflow/schemas.py
+  - workflow/review_ops.py
+  verification:
+  - python -m pytest -q tests/test_state_schema.py tests/test_review_queue_flow.py
+  depends_on:
+  - T-0001
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0004
+  title: 实现 verify/audit 审计验证流水线
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - verify 生成测试报告
+  - audit 输出 P0/P1/P2 与修复建议
+  evidence:
+  - workflow/verify.py
+  - workflow/audit.py
+  verification:
+  - python -m workflow verify
+  - python -m workflow audit
+  depends_on:
+  - T-0003
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0005
+  title: 实现 Streamlit dashboard 六页签
+  type: code
+  priority: P1
+  owner: codex
+  status: done
+  acceptance:
+  - Overview/Tasks/Review Queue/Checkpoints/Audit&Verify/Jobs&AI 可打开
+  - git 写历史操作前需确认
+  evidence:
+  - dashboard/app.py
+  - dashboard/components.py
+  verification:
+  - streamlit run dashboard/app.py
+  depends_on:
+  - T-0004
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0006
+  title: 实现自动 PR 与 reject 级联重启
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - pr open/update/list/close-superseded 可运行
+  - reject 可触发 rollback + 任务重置 + PR 关闭
+  evidence:
+  - workflow/pr_ops.py
+  - workflow/review_ops.py
+  - tests/test_reject_cascade.py
+  verification:
+  - python -m pytest -q tests/test_reject_cascade.py
+  depends_on:
+  - T-0003
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0007
+  title: 实现 AI plan/audit 与预算守卫
+  type: code
+  priority: P1
+  owner: codex
+  status: done
+  acceptance:
+  - ai plan/audit 在无 key 时落盘 pending 报告
+  - 80%预警与100%降级策略可触发
+  evidence:
+  - workflow/ai.py
+  - state/AI_BUDGET.yaml
+  - tests/test_ai_budget.py
+  verification:
+  - python -m pytest -q tests/test_ai_budget.py
+  depends_on:
+  - T-0004
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0008
+  title: 补齐文档与 GitHub Actions 模板
+  type: writing
+  priority: P1
+  owner: codex
+  status: done
+  acceptance:
+  - WORKFLOW/DATA_MODEL/GOVERNANCE/AI_PROMPTS 文档完善
+  - ci/audit/codex-review workflow 模板可用
+  evidence:
+  - docs/WORKFLOW.md
+  - .github/workflows/ci.yml
+  verification:
+  - python -m workflow audit
+  depends_on:
+  - T-0004
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0009
+  title: 人类最终审查与首次真实项目启动
+  type: meta
+  priority: P1
+  owner: human
+  status: done
+  acceptance:
+  - 审阅 Reviewer Brief 并确认回滚策略
+  - 创建首个研究任务并进入 daily loop
+  evidence:
+  - artifacts/audit/pr-ready-brief.md
+  verification:
+  - python -m workflow review-queue sync
+  depends_on:
+  - T-0008
+  created_at: '2026-02-20'
+  updated_at: '2026-02-21'
+- id: T-0010
+  title: '[RL-001] Project scaffold and prompt templates'
+  type: meta
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - projects/rl-gridworld-qlearning/ directory exists
+  - five prompt templates exist under project prompts
+  evidence:
+  - projects/rl-gridworld-qlearning/README.md
+  - projects/rl-gridworld-qlearning/prompts/prompt-05-ai-audit.md
+  verification:
+  - ls projects/rl-gridworld-qlearning/prompts
+  depends_on: []
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'
+- id: T-0011
+  title: '[RL-002] Implement deterministic Gridworld Q-learning'
+  type: experiment
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - tabular Q-learning implementation with fixed seed
+  - artifacts generated under artifacts/experiments/rl-gridworld-qlearning
+  evidence:
+  - projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py
+  - projects/rl-gridworld-qlearning/derivations/q_learning_bellman_relation.md
+  - artifacts/experiments/rl-gridworld-qlearning/summary.json
+  verification:
+  - .venv/bin/python projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py
+  - .venv/bin/python projects/rl-gridworld-qlearning/derivations/q_learning_bellman_check.py
+  - .venv/bin/python -m pytest -q tests/test_rl_gridworld_qlearning.py
+  depends_on:
+  - T-0010
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'
+- id: T-0012
+  title: '[RL-003] Verify and audit coverage for RL project'
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - workflow verify passes
+  - workflow audit reports P0=0
+  evidence:
+  - artifacts/test/verify-20260221-0310.md
+  - artifacts/audit/20260221-0311.md
+  verification:
+  - .venv/bin/python -m workflow verify
+  - .venv/bin/python -m workflow audit
+  depends_on:
+  - T-0011
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'
+- id: T-0013
+  title: '[RL-004] Release automation bootstrap/publish/pr'
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - release bootstrap command creates/binds repository
+  - release publish pushes sync branch
+  - release pr recorded with role=release
+  evidence:
+  - workflow/release_ops.py
+  - state/PR_REGISTRY.yaml
+  - https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release/pull/1
+  verification:
+  - .venv/bin/python -m workflow release bootstrap --project rl-gridworld-qlearning
+    --visibility public
+  - .venv/bin/python -m workflow release publish --project rl-gridworld-qlearning
+  - .venv/bin/python -m workflow release pr --project rl-gridworld-qlearning --title
+    release --body body
+  depends_on:
+  - T-0011
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'
+- id: T-0014
+  title: '[RL-005] Final review and closure checklist'
+  type: meta
+  priority: P1
+  owner: human
+  status: done
+  acceptance:
+  - review queue approve action completed
+  - closure checklist updated
+  evidence:
+  - projects/rl-gridworld-qlearning/reports/closure.md
+  - state/PR_REGISTRY.yaml
+  verification:
+  - .venv/bin/python -m workflow review-queue sync
+  - .venv/bin/python -m workflow review-queue approve --id <RQ-ID> --reviewer human
+    --notes approved
+  depends_on:
+  - T-0012
+  - T-0013
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'

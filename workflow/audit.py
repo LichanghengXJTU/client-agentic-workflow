@@ -7,7 +7,12 @@ from pathlib import Path
 from typing import Iterable
 
 from .git_ops import get_status, git_log_name_only, list_checkpoint_tag_details
-from .schemas import format_issues, validate_key_results_data, validate_tasks_data
+from .schemas import (
+    format_issues,
+    validate_key_results_data,
+    validate_project_registry_data,
+    validate_tasks_data,
+)
 from .state_ops import read_yaml
 
 
@@ -37,6 +42,7 @@ def _required_file_checks(root: Path) -> list[AuditIssue]:
         "state/TASKS.yaml",
         "state/REVIEW_QUEUE.yaml",
         "state/KEY_RESULTS.yaml",
+        "state/PROJECT_REGISTRY.yaml",
         "state/DECISIONS.md",
         "state/CHECKPOINTS.md",
         "state/HUMAN_REVIEW_LOG.md",
@@ -154,6 +160,7 @@ def run_audit(cwd: str | Path | None = None) -> AuditResult:
 
     tasks_data = read_yaml(root / "state" / "TASKS.yaml")
     results_data = read_yaml(root / "state" / "KEY_RESULTS.yaml")
+    projects_data = read_yaml(root / "state" / "PROJECT_REGISTRY.yaml")
 
     ok_tasks, task_issues = validate_tasks_data(tasks_data)
     if not ok_tasks:
@@ -174,6 +181,18 @@ def run_audit(cwd: str | Path | None = None) -> AuditResult:
                 AuditIssue(
                     severity="P0",
                     category="key_results_schema",
+                    message=f"{item['path']}: {item['message']}",
+                    suggestion=item["suggestion"],
+                )
+            )
+
+    ok_projects, project_issues = validate_project_registry_data(projects_data)
+    if not ok_projects:
+        for item in format_issues(project_issues):
+            issues.append(
+                AuditIssue(
+                    severity="P0",
+                    category="project_registry_schema",
                     message=f"{item['path']}: {item['message']}",
                     suggestion=item["suggestion"],
                 )
@@ -213,7 +232,11 @@ def run_audit(cwd: str | Path | None = None) -> AuditResult:
         lines.append("- PASS: required files exist.")
 
     lines.extend(["", "## Task/Result consistency checks"])
-    consistency = [i for i in issues if i.category in {"tasks_schema", "key_results_schema", "task_result_consistency"}]
+    consistency = [
+        i
+        for i in issues
+        if i.category in {"tasks_schema", "key_results_schema", "project_registry_schema", "task_result_consistency"}
+    ]
     if consistency:
         for issue in consistency:
             lines.append(f"- [{issue.severity}] {issue.message} | Fix: {issue.suggestion}")

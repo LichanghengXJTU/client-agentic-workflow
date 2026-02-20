@@ -95,3 +95,39 @@ results:
     first_seen_commit: "e432cae0191c8cec586b0e5c957af8e149f46f45"
     last_confirmed_commit: "e432cae0191c8cec586b0e5c957af8e149f46f45"
     checkpoint_tags: []
+
+  - id: "KR-0007"
+    statement: "RL Gridworld Q-learning 实验在固定 seed 下可复现，且训练后期回报与成功率优于初期。"
+    status: "verified"
+    confidence: "high"
+    evidence:
+      - "projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py"
+      - "artifacts/experiments/rl-gridworld-qlearning/summary.json"
+      - "tests/test_rl_gridworld_qlearning.py"
+    verification:
+      - ".venv/bin/python projects/rl-gridworld-qlearning/experiments/gridworld_qlearning.py"
+      - ".venv/bin/python -m pytest -q tests/test_rl_gridworld_qlearning.py"
+    related_tasks:
+      - "T-0011"
+      - "T-0012"
+    first_seen_commit: "TBD"
+    last_confirmed_commit: "TBD"
+    checkpoint_tags: []
+
+  - id: "KR-0008"
+    statement: "跨库发布链路已打通：release bootstrap/publish/pr 可创建公开发布仓并记录 release PR。"
+    status: "verified"
+    confidence: "high"
+    evidence:
+      - "workflow/release_ops.py"
+      - "state/PR_REGISTRY.yaml"
+      - "https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release/pull/1"
+    verification:
+      - ".venv/bin/python -m workflow release bootstrap --project rl-gridworld-qlearning --visibility public"
+      - ".venv/bin/python -m workflow release publish --project rl-gridworld-qlearning"
+      - ".venv/bin/python -m workflow release pr --project rl-gridworld-qlearning --title release --body body"
+    related_tasks:
+      - "T-0013"
+    first_seen_commit: "TBD"
+    last_confirmed_commit: "TBD"
+    checkpoint_tags: []

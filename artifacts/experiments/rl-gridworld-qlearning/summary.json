@@ -1,0 +1,19 @@
+{
+  "config": {
+    "size": 4,
+    "episodes": 500,
+    "max_steps": 40,
+    "alpha": 0.2,
+    "gamma": 0.95,
+    "epsilon_start": 0.3,
+    "epsilon_end": 0.05,
+    "epsilon_decay": 0.995,
+    "seed": 42
+  },
+  "metrics": {
+    "initial_avg_reward": -0.28,
+    "final_avg_reward": 4.86,
+    "success_rate_last_100": 1.0,
+    "greedy_steps": 6
+  }
+}
