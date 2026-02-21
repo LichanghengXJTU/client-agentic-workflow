@@ -78,15 +78,19 @@ python3 -m workflow pr list
 python3 -m workflow pr close-superseded --anchor <checkpoint-or-commit>
 ```
 
-## 8. AI plan/audit（预算守卫）
+## 8. AI plan/audit/task（预算守卫 + 任务路由）
 ```bash
 python3 -m workflow ai plan
 python3 -m workflow ai audit
+python3 -m workflow ai task --id T-0015 --intent design
+python3 -m workflow ai task --id T-0015 --intent run
 ```
 - 配置：`state/AI_CONFIG.yaml`
 - 密钥（本地不入库）：`state/AI_SECRETS.local.yaml` 或 `OPENAI_API_KEY`
 - 预算账本：`state/AI_BUDGET.yaml`
-- 80% 预警，100% 自动降级模型。
+- 路由：`plan/audit -> pro`，`task.type -> pro/codex`（`experiment` 支持 `design/run`）。
+- 80% 预警，100% 自动降级 `hard_limit_model`（默认 `gpt-5-mini`）。
+- 模型不可用时按 route 对应 fallback chain 自动回退。
 
 ## 8.5 Task Role Run（run_meta）
 ```bash

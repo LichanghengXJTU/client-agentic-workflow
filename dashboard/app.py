@@ -13,7 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from dashboard.components import git_write_guard, section_header, status_badge
-from workflow.ai import run_ai_audit, run_ai_plan
+from workflow.ai import run_ai_audit, run_ai_plan, run_ai_task
 from workflow.audit import run_audit
 from workflow.checkpoint import create_checkpoint, list_checkpoints
 from workflow.git_ops import get_status
@@ -275,6 +275,38 @@ def _render_jobs_ai() -> None:
             st.success(f"AI audit generated: {result.output_path} | model={result.model}")
         else:
             st.warning(f"AI audit pending: {result.output_path} | {result.message}")
+
+    st.markdown("### AI Task (Task-aware Routing)")
+    tasks = load_tasks()
+    task_ids = [str(item.get("id")) for item in tasks if isinstance(item, dict) and item.get("id")]
+    if not task_ids:
+        st.info("No task available. Please create task first in TASKS tab.")
+        return
+
+    with st.form("ai_task_form"):
+        selected_task = st.selectbox("Task ID", options=task_ids)
+        intent_choice = st.selectbox("Intent", options=["(default: design)", "design", "run"])
+        task_output = st.text_input("Output path (optional)", value="")
+        task_extra = st.text_area("Task Prompt / Extra Context", value="", height=120)
+        submitted = st.form_submit_button("Run AI Task")
+        if submitted:
+            intent = None if intent_choice.startswith("(default") else intent_choice
+            result = run_ai_task(
+                task_id=selected_task,
+                intent=intent,
+                prompt=task_extra,
+                output_path=task_output or None,
+            )
+            if result.ok:
+                st.success(
+                    f"AI task generated: {result.output_path} | route={result.route_key} | "
+                    f"requested={result.requested_model} | model={result.model}"
+                )
+            else:
+                st.warning(
+                    f"AI task pending: {result.output_path} | route={result.route_key} | "
+                    f"requested={result.requested_model} | {result.message}"
+                )
 
 
 def main() -> None:

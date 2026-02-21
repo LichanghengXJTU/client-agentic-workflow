@@ -93,7 +93,47 @@ alert_threshold: 0.8
 hard_limit_threshold: 1.0
 current_month: "YYYY-MM"
 spend_usd: 0.0
-entries: []
+entries:
+  - time: "YYYY-MM-DDTHH:MM:SS"
+    task_type: "plan|audit|task:code|task:derivation|..."
+    route_key: "pro|codex"
+    requested_model: "gpt-5.2-pro"
+    model: "gpt-5.2-pro|gpt-5-pro|..."
+    fallback_hops: 0
+    selection_note: "normal|hard_limit_reached_downgraded|..."
+    input_tokens: 0
+    output_tokens: 0
+    cached_tokens: 0
+    cost_usd: 0.0
+    note: "selection note mirror for backward compatibility"
+```
+
+## AI_CONFIG.yaml (v2)
+```yaml
+version: 2
+models:
+  pro: "gpt-5.2-pro"
+  codex: "gpt-5.2-codex"
+routing:
+  plan: "pro"
+  audit: "pro"
+  task_type:
+    code: "codex"
+    derivation: "pro"
+    writing: "pro"
+    literature: "pro"
+    meta: "pro"
+    experiment:
+      design: "pro"
+      run: "codex"
+fallback_chains:
+  pro: ["gpt-5.2-pro", "gpt-5-pro", "gpt-5.2", "gpt-5.1", "gpt-5", "gpt-5-mini"]
+  codex: ["gpt-5.2-codex", "gpt-5.1-codex-max", "gpt-5.1-codex", "gpt-5-codex", "gpt-5.2", "gpt-5-mini"]
+effort_by_route:
+  pro: "xhigh"
+  codex: "xhigh"
+  hard_limit: "high"
+hard_limit_model: "gpt-5-mini"
 ```
 
 ## state/tasks/<task_id>/brief.yaml

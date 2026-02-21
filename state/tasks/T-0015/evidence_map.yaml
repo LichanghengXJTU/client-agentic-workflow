@@ -7,7 +7,7 @@ claims:
   confidence: high
   evidence:
   - cite: docs/WORKFLOW.md#L51
-    source_sha256: sha256:5b488a9c06eb2f5dea44aa0c9fbf89ddee5cc5ed35decf128535e530a2715bf8
+    source_sha256: sha256:4fa824559c14708790e24438abc1c24d7bd6f27362922871a397f92a4701cea2
     note: WORKFLOW 文档已包含 verify/audit 与 task/kb 命令落点
   - cite: docs/TASK_WORKFLOW.md#L1
     source_sha256: sha256:bfb62f8a9caf9c5c898c8bb1a4c0e7ce63ca469680ce2423556b3eb94b406cd1

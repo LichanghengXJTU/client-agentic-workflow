@@ -173,7 +173,9 @@ python -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
 ### 4.8 AI Budget Guardrails
 - 配置文件：`state/AI_CONFIG.yaml`。
 - 账本文件：`state/AI_BUDGET.yaml`。
-- 预算策略：80% 预警、100% 降级 low_cost_model。
+- 模型路由：`plan/audit -> pro`，`task(type) -> pro/codex`。
+- 预算策略：80% 预警、100% 降级 `hard_limit_model`（默认 `gpt-5-mini`）。
+- 支持自动 fallback chain（模型不可用时按路由链回退）。
 - 无 API key 时生成 pending 报告，不中断流程。
 
 ## 5. 代码框架详解（Code Framework）
@@ -274,6 +276,14 @@ python3 -m workflow task run --id T-0015 --role critic --cmd ".venv/bin/python -
 python3 -m workflow release bootstrap --project rl-gridworld-qlearning --visibility public
 python3 -m workflow release publish --project rl-gridworld-qlearning
 python3 -m workflow release pr --project rl-gridworld-qlearning --title "release: sync" --body "sync from source"
+```
+
+#### 场景 F：Task-Aware AI 路由
+```bash
+python3 -m workflow ai plan
+python3 -m workflow ai audit
+python3 -m workflow ai task --id T-0015 --intent design
+python3 -m workflow ai task --id T-0015 --intent run --output artifacts/tasks/T-0015/ai/custom.md
 ```
 
 ## 7. 质量门禁（Quality Gates）

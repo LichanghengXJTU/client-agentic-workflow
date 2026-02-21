@@ -1,23 +1,69 @@
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from .state_ops import AI_BUDGET_PATH, AI_CONFIG_PATH, atomic_write_yaml, read_yaml
+from .state_ops import AI_BUDGET_PATH, AI_CONFIG_PATH, atomic_write_yaml, read_yaml, task_by_id
+
+
+MAX_RETRY_PER_MODEL = 2
 
 
 @dataclass
 class AICallResult:
     ok: bool
     model: str
+    requested_model: str
+    route_key: str
+    selection_note: str
     output_path: str
     text: str
     spend_usd: float
     budget_ratio: float
     message: str
+
+
+def default_ai_config_v2() -> dict[str, Any]:
+    return {
+        "version": 2,
+        "models": {
+            "pro": "gpt-5.2-pro",
+            "codex": "gpt-5.2-codex",
+        },
+        "routing": {
+            "plan": "pro",
+            "audit": "pro",
+            "task_type": {
+                "code": "codex",
+                "derivation": "pro",
+                "writing": "pro",
+                "literature": "pro",
+                "meta": "pro",
+                "experiment": {
+                    "design": "pro",
+                    "run": "codex",
+                },
+            },
+        },
+        "fallback_chains": {
+            "pro": ["gpt-5.2-pro", "gpt-5-pro", "gpt-5.2", "gpt-5.1", "gpt-5", "gpt-5-mini"],
+            "codex": ["gpt-5.2-codex", "gpt-5.1-codex-max", "gpt-5.1-codex", "gpt-5-codex", "gpt-5.2", "gpt-5-mini"],
+        },
+        "effort_by_route": {
+            "pro": "xhigh",
+            "codex": "xhigh",
+            "hard_limit": "high",
+        },
+        "hard_limit_model": "gpt-5-mini",
+        "price_per_1m_input_usd": 10.0,
+        "price_per_1m_output_usd": 30.0,
+        "price_per_1m_cached_input_usd": 2.5,
+        "notes": "Do not store API key here. Put key in state/AI_SECRETS.local.yaml or OPENAI_API_KEY env.",
+    }
 
 
 def _load_local_secrets() -> dict[str, Any]:
@@ -27,18 +73,64 @@ def _load_local_secrets() -> dict[str, Any]:
     return read_yaml(path)
 
 
-def _load_ai_config() -> dict[str, Any]:
-    cfg = read_yaml(AI_CONFIG_PATH)
+def _normalize_ai_config(cfg: dict[str, Any]) -> dict[str, Any]:
+    base = default_ai_config_v2()
     if not cfg:
-        cfg = {
-            "default_model": "gpt-5",
-            "low_cost_model": "gpt-4.1-mini",
-            "reasoning_effort": "high",
-            "price_per_1m_input_usd": 10.0,
-            "price_per_1m_output_usd": 30.0,
-            "price_per_1m_cached_input_usd": 2.5,
-        }
-    return cfg
+        return base
+
+    # v2 shape
+    if isinstance(cfg.get("routing"), dict):
+        merged = default_ai_config_v2()
+        merged.update({k: v for k, v in cfg.items() if k not in {"models", "routing", "fallback_chains", "effort_by_route"}})
+
+        incoming_models = cfg.get("models")
+        if isinstance(incoming_models, dict):
+            merged["models"].update(incoming_models)
+
+        incoming_fallback = cfg.get("fallback_chains")
+        if isinstance(incoming_fallback, dict):
+            merged["fallback_chains"].update(incoming_fallback)
+
+        incoming_effort = cfg.get("effort_by_route")
+        if isinstance(incoming_effort, dict):
+            merged["effort_by_route"].update(incoming_effort)
+
+        incoming_routing = cfg.get("routing")
+        if isinstance(incoming_routing, dict):
+            for key, value in incoming_routing.items():
+                if key == "task_type" and isinstance(value, dict):
+                    merged["routing"]["task_type"].update(value)
+                else:
+                    merged["routing"][key] = value
+        return merged
+
+    # legacy shape fallback
+    legacy_default = str(cfg.get("default_model", "gpt-5"))
+    legacy_low = str(cfg.get("low_cost_model", "gpt-4.1-mini"))
+    legacy_effort = str(cfg.get("reasoning_effort", "high"))
+
+    base["models"]["pro"] = legacy_default
+    base["models"]["codex"] = legacy_default
+    base["hard_limit_model"] = legacy_low
+    base["effort_by_route"]["pro"] = legacy_effort
+    base["effort_by_route"]["codex"] = legacy_effort
+    base["effort_by_route"]["hard_limit"] = "high"
+
+    for rate_key in [
+        "price_per_1m_input_usd",
+        "price_per_1m_output_usd",
+        "price_per_1m_cached_input_usd",
+    ]:
+        if rate_key in cfg:
+            base[rate_key] = cfg[rate_key]
+
+    if "notes" in cfg:
+        base["notes"] = cfg["notes"]
+    return base
+
+
+def _load_ai_config() -> dict[str, Any]:
+    return _normalize_ai_config(read_yaml(AI_CONFIG_PATH))
 
 
 def _load_budget() -> dict[str, Any]:
@@ -62,6 +154,12 @@ def _load_budget() -> dict[str, Any]:
 
 def _save_budget(data: dict[str, Any]) -> None:
     atomic_write_yaml(AI_BUDGET_PATH, data)
+
+
+def _budget_ratio(budget: dict[str, Any]) -> float:
+    monthly_budget = float(budget.get("monthly_budget_usd", 2000.0))
+    spend = float(budget.get("spend_usd", 0.0))
+    return (spend / monthly_budget) if monthly_budget > 0 else 0.0
 
 
 def _api_key() -> str | None:
@@ -111,21 +209,58 @@ def _estimate_cost_usd(config: dict[str, Any], in_tokens: int, out_tokens: int, 
     return round(cost, 6)
 
 
-def _select_model(task_type: str, config: dict[str, Any], budget: dict[str, Any]) -> tuple[str, str]:
-    default_model = str(config.get("default_model", "gpt-5"))
-    low_model = str(config.get("low_cost_model", "gpt-4.1-mini"))
+def resolve_route(task_type: str, intent: str | None, task_id: str | None, config: dict[str, Any]) -> tuple[str, str]:
+    routing = config.get("routing", {})
 
-    monthly_budget = float(budget.get("monthly_budget_usd", 2000.0))
-    spend = float(budget.get("spend_usd", 0.0))
-    ratio = (spend / monthly_budget) if monthly_budget > 0 else 0.0
+    if task_type in {"plan", "audit"}:
+        return str(routing.get(task_type, "pro")), "normal"
 
-    preferred = default_model if task_type in {"plan", "audit"} else low_model
+    task_routes = routing.get("task_type", {})
+    route_cfg = task_routes.get(task_type)
+    if isinstance(route_cfg, str):
+        return route_cfg, "normal"
 
-    if ratio >= float(budget.get("hard_limit_threshold", 1.0)) and preferred == default_model:
-        return low_model, "hard_limit_reached_downgraded"
-    if ratio >= float(budget.get("alert_threshold", 0.8)) and preferred == default_model:
-        return preferred, "alert_threshold_reached"
-    return preferred, "normal"
+    if isinstance(route_cfg, dict):
+        resolved_intent = (intent or "design").strip().lower() or "design"
+        if resolved_intent not in {"design", "run"}:
+            resolved_intent = "design"
+        note = "experiment_intent_defaulted_design" if task_type == "experiment" and not intent else "normal"
+        return str(route_cfg.get(resolved_intent, route_cfg.get("design", "pro"))), note
+
+    return "pro", "route_fallback_default"
+
+
+def _select_target(
+    *,
+    task_type: str,
+    intent: str | None,
+    task_id: str | None,
+    config: dict[str, Any],
+    budget: dict[str, Any],
+) -> tuple[str, str, str, str]:
+    route_key, route_note = resolve_route(task_type=task_type, intent=intent, task_id=task_id, config=config)
+
+    models = config.get("models", {})
+    requested_model = str(models.get(route_key, "gpt-5.2-pro"))
+    effort = str(config.get("effort_by_route", {}).get(route_key, "xhigh"))
+
+    ratio = _budget_ratio(budget)
+    alert_threshold = float(budget.get("alert_threshold", 0.8))
+    hard_threshold = float(budget.get("hard_limit_threshold", 1.0))
+
+    selection_note = "normal"
+    if ratio >= alert_threshold:
+        selection_note = "alert_threshold_reached"
+
+    if ratio >= hard_threshold:
+        requested_model = str(config.get("hard_limit_model", "gpt-5-mini"))
+        effort = str(config.get("effort_by_route", {}).get("hard_limit", "high"))
+        selection_note = "hard_limit_reached_downgraded"
+
+    if route_note != "normal":
+        selection_note = f"{selection_note}|{route_note}"
+
+    return route_key, requested_model, effort, selection_note
 
 
 def _write_text(path: Path, text: str) -> None:
@@ -133,11 +268,23 @@ def _write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def _build_missing_key_text(task_type: str) -> str:
+def _build_missing_key_text(
+    *,
+    task_type: str,
+    route_key: str,
+    requested_model: str,
+    selection_note: str,
+    task_id: str | None,
+) -> str:
     now = datetime.now().isoformat(timespec="seconds")
+    task_line = f"- Task ID: {task_id}\n" if task_id else ""
     return (
         f"# AI {task_type.capitalize()} (Pending)\n\n"
         f"- Time: {now}\n"
+        f"- Route: {route_key}\n"
+        f"- Requested model: {requested_model}\n"
+        f"- Selection note: {selection_note}\n"
+        f"{task_line}"
         "- OPENAI_API_KEY is set: no\n"
         "- Action: skipped remote AI call, please provide API key in env or state/AI_SECRETS.local.yaml\n"
     )
@@ -154,6 +301,104 @@ def _invoke_responses_api(api_key: str, model: str, prompt: str, effort: str) ->
     )
 
 
+def _error_status_code(exc: Exception) -> int | None:
+    status = getattr(exc, "status_code", None)
+    if isinstance(status, int):
+        return status
+
+    response = getattr(exc, "response", None)
+    response_status = getattr(response, "status_code", None)
+    if isinstance(response_status, int):
+        return response_status
+    return None
+
+
+def _is_retryable_error(exc: Exception) -> bool:
+    status = _error_status_code(exc)
+    if status in {429, 500, 502, 503, 504}:
+        return True
+    name = type(exc).__name__.lower()
+    return "timeout" in name or "connection" in name
+
+
+def _is_model_unavailable_error(exc: Exception) -> bool:
+    status = _error_status_code(exc)
+    message = str(exc).lower()
+
+    if status in {403, 404}:
+        return True
+
+    if status == 400:
+        keys = [
+            "model",
+            "does not exist",
+            "not found",
+            "not available",
+            "not supported",
+            "permission",
+            "access",
+            "unsupported",
+        ]
+        return any(token in message for token in keys)
+
+    return False
+
+
+def _build_model_chain(
+    *,
+    route_key: str,
+    requested_model: str,
+    config: dict[str, Any],
+    hard_limited: bool,
+) -> list[str]:
+    if hard_limited:
+        return [requested_model]
+
+    chain_raw = config.get("fallback_chains", {}).get(route_key, [])
+    chain: list[str] = [requested_model]
+    if isinstance(chain_raw, list):
+        chain.extend(str(item) for item in chain_raw if isinstance(item, str))
+
+    dedup: list[str] = []
+    seen: set[str] = set()
+    for model in chain:
+        if not model or model in seen:
+            continue
+        seen.add(model)
+        dedup.append(model)
+    return dedup or [requested_model]
+
+
+def invoke_with_fallback(
+    *,
+    api_key: str,
+    prompt: str,
+    effort: str,
+    model_chain: list[str],
+) -> tuple[Any, str, int, str]:
+    visited: list[str] = []
+
+    for model in model_chain:
+        visited.append(model)
+        retry_count = 0
+        while True:
+            try:
+                response = _invoke_responses_api(api_key=api_key, model=model, prompt=prompt, effort=effort)
+                hops = max(0, len(visited) - 1)
+                note = "normal" if hops == 0 else f"fallback_applied:{'->'.join(visited)}"
+                return response, model, hops, note
+            except Exception as exc:  # pragma: no cover - exercised via tests with monkeypatch
+                if _is_retryable_error(exc) and retry_count < MAX_RETRY_PER_MODEL:
+                    retry_count += 1
+                    continue
+                if _is_model_unavailable_error(exc):
+                    break
+                raise
+
+    chain_text = " -> ".join(model_chain)
+    raise RuntimeError(f"All models failed in fallback chain: {chain_text}")
+
+
 def _record_budget_entry(
     task_type: str,
     model: str,
@@ -162,6 +407,11 @@ def _record_budget_entry(
     cached_tokens: int,
     cost_usd: float,
     note: str,
+    *,
+    route_key: str,
+    requested_model: str,
+    fallback_hops: int,
+    selection_note: str,
 ) -> tuple[float, float]:
     budget = _load_budget()
     budget["spend_usd"] = round(float(budget.get("spend_usd", 0.0)) + cost_usd, 6)
@@ -169,7 +419,11 @@ def _record_budget_entry(
         {
             "time": datetime.now().isoformat(timespec="seconds"),
             "task_type": task_type,
+            "route_key": route_key,
+            "requested_model": requested_model,
             "model": model,
+            "fallback_hops": fallback_hops,
+            "selection_note": selection_note,
             "input_tokens": in_tokens,
             "output_tokens": out_tokens,
             "cached_tokens": cached_tokens,
@@ -184,32 +438,148 @@ def _record_budget_entry(
     return float(budget.get("spend_usd", 0.0)), ratio
 
 
+def _render_ai_report(
+    *,
+    task_type: str,
+    route_key: str,
+    model: str,
+    requested_model: str,
+    selection_note: str,
+    prompt: str,
+    text: str,
+    task_id: str | None = None,
+    intent: str | None = None,
+) -> str:
+    now = datetime.now().isoformat(timespec="seconds")
+    title_map = {
+        "plan": "# PLAN (AI Generated)",
+        "audit": "# AI Audit Report",
+    }
+    title = title_map.get(task_type, "# AI Task Report")
+    task_block = ""
+    if task_id:
+        task_block = f"- Task ID: {task_id}\n- Intent: {intent or 'design'}\n"
+
+    return (
+        f"{title}\n\n"
+        f"- Time: {now}\n"
+        f"- Route: {route_key}\n"
+        f"- Requested model: {requested_model}\n"
+        f"- Model: {model}\n"
+        f"- Selection note: {selection_note}\n"
+        f"{task_block}"
+        "- OPENAI_API_KEY is set: yes\n\n"
+        "## Input Summary\n"
+        f"{prompt[:1000]}\n\n"
+        "## Output\n"
+        f"{text}\n"
+    )
+
+
 def run_ai_plan(prompt: str, output_path: str = "state/PLAN.md") -> AICallResult:
-    return _run_ai_task(task_type="plan", prompt=prompt, output_path=output_path)
+    return _run_ai_request(task_type="plan", prompt=prompt, output_path=output_path)
 
 
 def run_ai_audit(prompt: str, output_path: str | None = None) -> AICallResult:
     if output_path is None:
         ts = datetime.now().strftime("%Y%m%d-%H%M")
         output_path = f"artifacts/audit/ai-{ts}.md"
-    return _run_ai_task(task_type="audit", prompt=prompt, output_path=output_path)
+    return _run_ai_request(task_type="audit", prompt=prompt, output_path=output_path)
 
 
-def _run_ai_task(task_type: str, prompt: str, output_path: str) -> AICallResult:
+def run_ai_task(
+    *,
+    task_id: str,
+    intent: str | None = None,
+    prompt: str,
+    output_path: str | None = None,
+) -> AICallResult:
+    task = task_by_id(task_id)
+    task_type = str(task.get("type", "meta"))
+    if output_path is None:
+        ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+        output_path = f"artifacts/tasks/{task_id}/ai/ai-{ts}.md"
+
+    resolved_intent = intent
+    if task_type == "experiment" and not resolved_intent:
+        resolved_intent = "design"
+
+    final_prompt = prompt or (
+        "请基于以下任务给出可执行且可验证的实施内容，输出应包含检查点与风险控制。\n\n"
+        f"TASK:\n{json.dumps(task, ensure_ascii=False, indent=2)}\n\n"
+        f"INTENT: {resolved_intent or 'design'}\n"
+    )
+
+    return _run_ai_request(
+        task_type=task_type,
+        prompt=final_prompt,
+        output_path=output_path,
+        task_id=task_id,
+        intent=resolved_intent,
+        budget_task_type=f"task:{task_type}",
+    )
+
+
+def _run_ai_request(
+    *,
+    task_type: str,
+    prompt: str,
+    output_path: str,
+    task_id: str | None = None,
+    intent: str | None = None,
+    budget_task_type: str | None = None,
+) -> AICallResult:
     config = _load_ai_config()
     budget = _load_budget()
-    model, selection_note = _select_model(task_type, config, budget)
+
+    route_key, requested_model, effort, selection_note = _select_target(
+        task_type=task_type,
+        intent=intent,
+        task_id=task_id,
+        config=config,
+        budget=budget,
+    )
+
+    hard_limited = selection_note.startswith("hard_limit_reached_downgraded")
+    model_chain = _build_model_chain(
+        route_key=route_key,
+        requested_model=requested_model,
+        config=config,
+        hard_limited=hard_limited,
+    )
 
     key = _api_key()
     out_path = Path(output_path)
+    task_type_for_budget = budget_task_type or task_type
 
     if not key:
-        text = _build_missing_key_text(task_type)
+        text = _build_missing_key_text(
+            task_type=task_type,
+            route_key=route_key,
+            requested_model=requested_model,
+            selection_note=selection_note,
+            task_id=task_id,
+        )
         _write_text(out_path, text)
-        spend, ratio = _record_budget_entry(task_type, model, 0, 0, 0, 0.0, "missing_api_key")
+        spend, ratio = _record_budget_entry(
+            task_type_for_budget,
+            requested_model,
+            0,
+            0,
+            0,
+            0.0,
+            "missing_api_key",
+            route_key=route_key,
+            requested_model=requested_model,
+            fallback_hops=0,
+            selection_note=selection_note,
+        )
         return AICallResult(
             ok=False,
-            model=model,
+            model=requested_model,
+            requested_model=requested_model,
+            route_key=route_key,
+            selection_note=selection_note,
             output_path=str(out_path),
             text=text,
             spend_usd=spend,
@@ -217,48 +587,50 @@ def _run_ai_task(task_type: str, prompt: str, output_path: str) -> AICallResult:
             message="OPENAI_API_KEY missing; generated pending report.",
         )
 
-    response = _invoke_responses_api(
+    response, final_model, fallback_hops, fallback_note = invoke_with_fallback(
         api_key=key,
-        model=model,
         prompt=prompt,
-        effort=str(config.get("reasoning_effort", "high")),
+        effort=effort,
+        model_chain=model_chain,
     )
     text = _extract_output_text(response)
 
-    if task_type == "plan":
-        rendered = (
-            "# PLAN (AI Generated)\n\n"
-            f"- Time: {datetime.now().isoformat(timespec='seconds')}\n"
-            f"- Model: {model}\n"
-            f"- Selection note: {selection_note}\n"
-            f"- OPENAI_API_KEY is set: yes\n\n"
-            "## Input Summary\n"
-            f"{prompt[:1000]}\n\n"
-            "## Output\n"
-            f"{text}\n"
-        )
-    else:
-        rendered = (
-            "# AI Audit Report\n\n"
-            f"- Time: {datetime.now().isoformat(timespec='seconds')}\n"
-            f"- Model: {model}\n"
-            f"- Selection note: {selection_note}\n"
-            f"- OPENAI_API_KEY is set: yes\n\n"
-            "## Input Summary\n"
-            f"{prompt[:1000]}\n\n"
-            "## Output\n"
-            f"{text}\n"
-        )
-
+    final_selection_note = selection_note if fallback_note == "normal" else f"{selection_note}|{fallback_note}"
+    rendered = _render_ai_report(
+        task_type=task_type,
+        route_key=route_key,
+        model=final_model,
+        requested_model=requested_model,
+        selection_note=final_selection_note,
+        prompt=prompt,
+        text=text,
+        task_id=task_id,
+        intent=intent,
+    )
     _write_text(out_path, rendered)
 
     in_tokens, out_tokens, cached_tokens = _usage_tokens(response)
     cost_usd = _estimate_cost_usd(config, in_tokens, out_tokens, cached_tokens)
-    spend, ratio = _record_budget_entry(task_type, model, in_tokens, out_tokens, cached_tokens, cost_usd, selection_note)
+    spend, ratio = _record_budget_entry(
+        task_type_for_budget,
+        final_model,
+        in_tokens,
+        out_tokens,
+        cached_tokens,
+        cost_usd,
+        final_selection_note,
+        route_key=route_key,
+        requested_model=requested_model,
+        fallback_hops=fallback_hops,
+        selection_note=final_selection_note,
+    )
 
     return AICallResult(
         ok=True,
-        model=model,
+        model=final_model,
+        requested_model=requested_model,
+        route_key=route_key,
+        selection_note=final_selection_note,
         output_path=str(out_path),
         text=rendered,
         spend_usd=spend,

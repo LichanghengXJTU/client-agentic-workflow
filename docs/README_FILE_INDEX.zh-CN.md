@@ -29,7 +29,7 @@
 | `workflow/pr_ops.py` | source PR 自动化 | `open_pr`, `update_pr`, `close_superseded_prs` | gh + git context | pr entry data | `state/PR_REGISTRY.yaml` | `tests/test_reject_cascade.py`（间接） |
 | `workflow/project_ops.py` | project registry 管理 | `add_project`, `update_project`, `scaffold_project` | slug/title/release metadata | project entry + scaffold files | `state/PROJECT_REGISTRY.yaml`, `projects/<slug>/` | `tests/test_project_registry.py` |
 | `workflow/release_ops.py` | cross-repo release automation | `bootstrap_release_repo`, `publish_project_release`, `open_release_pr` | project slug, repo settings | release metadata | release repo pushes + `state/PR_REGISTRY.yaml` | `tests/test_release_ops.py` |
-| `workflow/ai.py` | AI 调用与预算守卫 | `run_ai_plan`, `run_ai_audit`, `_select_model`, `_record_budget_entry` | prompt + budget + api key | plan/audit markdown, budget updates | `state/AI_BUDGET.yaml`, `state/PLAN.md`, `artifacts/audit/ai-*.md` | `tests/test_ai_budget.py` |
+| `workflow/ai.py` | AI 调用与预算守卫 + 任务路由 | `run_ai_plan`, `run_ai_audit`, `run_ai_task`, `resolve_route`, `invoke_with_fallback` | prompt/task + budget + api key | plan/audit/task markdown, budget updates | `state/AI_BUDGET.yaml`, `state/PLAN.md`, `artifacts/audit/ai-*.md`, `artifacts/tasks/*/ai/*.md` | `tests/test_ai_budget.py`, `tests/test_ai_routing.py`, `tests/test_ai_fallback.py` |
 | `dashboard/app.py` | Streamlit UI 主入口 | `_render_*`, `main` | state + workflow module calls | web UI actions | 触发 workflow 副作用 | `tests/test_dashboard_smoke.py` |
 | `dashboard/components.py` | UI 组件封装 | `git_write_guard`, `status_badge` | UI interaction | guarded actions | 无直接 state 改写 | `tests/test_dashboard_smoke.py`（导入级） |
 | `docs/WORKFLOW.md` | 日常命令手册 | command playbook | user intent | operational guidance | 无 | 文档审计间接覆盖 |
@@ -70,7 +70,7 @@
 - `pr open/update/list/close-superseded`
 - `project list/add/update/scaffold`
 - `release bootstrap/publish/pr`
-- `ai plan/audit`
+- `ai plan/audit/task`
 
 ### 3.2 关键数据流
 1. `task run` -> `task_ops.record_task_run` -> `run_meta.yaml + run_index.yaml + worklog.md`。
@@ -110,6 +110,9 @@
 | `tests/test_reject_cascade.py` | reject cascade | 任务未重置、KR 未降级、回退失败 |
 | `tests/test_jobs.py` | background jobs | 僵尸进程/状态不一致 |
 | `tests/test_ai_budget.py` | AI budget guardrails | 预算超限策略失效 |
+| `tests/test_ai_routing.py` | AI 路由矩阵与 legacy 兼容 | 任务类型路由错误或旧配置不兼容 |
+| `tests/test_ai_fallback.py` | AI fallback/retry 策略 | 模型不可用无法回退或重试行为错误 |
+| `tests/test_ai_cli.py` | `workflow ai task` CLI 行为 | 参数解析/错误返回/默认 intent 语义偏差 |
 | `tests/test_project_registry.py` | project registry + scaffold | 多项目记录损坏 |
 | `tests/test_release_ops.py` | release automation | 跨库发布链路断裂 |
 | `tests/test_task_run_meta.py` | run_meta persistence | 运行证据不可追溯 |
@@ -141,6 +144,8 @@
 - `artifacts/audit/20260221-0455.md`
 - `artifacts/audit/20260221-0456.md`
 - `artifacts/audit/20260221-1738.md`
+- `artifacts/audit/20260221-2034.md`
+- `artifacts/audit/20260221-2038.md`
 - `artifacts/audit/ai-20260221-0044.md`
 - `artifacts/audit/ai-20260221-0316.md`
 - `artifacts/audit/pr-ready-brief.md`
@@ -159,6 +164,8 @@
 - `artifacts/test/verify-20260221-0453.md`
 - `artifacts/test/verify-20260221-0456.md`
 - `artifacts/test/verify-20260221-1738.md`
+- `artifacts/test/verify-20260221-2034.md`
+- `artifacts/test/verify-20260221-2038.md`
 
 ### 6.3 artifacts/kb/index（倒排索引）
 - `artifacts/kb/index/chunk_meta.jsonl`
@@ -217,6 +224,9 @@
 - `artifacts/kb/query-20260221-045356.yaml`
 - `artifacts/kb/query-20260221-045605.yaml`
 - `artifacts/kb/query-20260221-173825.yaml`
+- `artifacts/kb/query-20260221-203403.yaml`
+- `artifacts/kb/query-20260221-203445.yaml`
+- `artifacts/kb/query-20260221-203810.yaml`
 
 ### 6.9 artifacts/tasks/T-0015/outputs（任务输出）
 - `artifacts/tasks/T-0015/outputs/ingest-20260221-045018.yaml`
@@ -228,6 +238,9 @@
 - `artifacts/tasks/T-0015/outputs/query-20260221-045356.yaml`
 - `artifacts/tasks/T-0015/outputs/query-20260221-045605.yaml`
 - `artifacts/tasks/T-0015/outputs/query-20260221-173825.yaml`
+- `artifacts/tasks/T-0015/outputs/query-20260221-203403.yaml`
+- `artifacts/tasks/T-0015/outputs/query-20260221-203445.yaml`
+- `artifacts/tasks/T-0015/outputs/query-20260221-203810.yaml`
 
 ### 6.10 artifacts/tasks/T-0015/runs/*（run_meta + logs）
 - `artifacts/tasks/T-0015/runs/RUN-20260221-045011755757/run_meta.yaml`
@@ -263,6 +276,15 @@
 - `artifacts/tasks/T-0015/runs/RUN-20260221-173825584102/run_meta.yaml`
 - `artifacts/tasks/T-0015/runs/RUN-20260221-173825584102/stderr.log`
 - `artifacts/tasks/T-0015/runs/RUN-20260221-173825584102/stdout.log`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203403708173/run_meta.yaml`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203403708173/stderr.log`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203403708173/stdout.log`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203445143105/run_meta.yaml`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203445143105/stderr.log`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203445143105/stdout.log`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203810117071/run_meta.yaml`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203810117071/stderr.log`
+- `artifacts/tasks/T-0015/runs/RUN-20260221-203810117071/stdout.log`
 
 ### 6.11 artifacts/experiments/rl-gridworld-qlearning（实验产物）
 - `artifacts/experiments/rl-gridworld-qlearning/q_table.npy`

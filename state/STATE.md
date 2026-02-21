@@ -260,3 +260,16 @@
   - No secret-value pattern found in tracked files selected for commit.
 - KEY_RESULTS decision:
   - No new critical conclusion introduced in this round; `state/KEY_RESULTS.yaml` was not updated by documentation-only logic.
+
+## AI Routing Upgrade (2026-02-21)
+- Implemented task-aware model routing in `workflow/ai.py` with v2 config schema, legacy config compatibility, and route-based fallback chains.
+- Added `workflow ai task --id ... [--intent design|run]` command and integrated routed AI task execution into `dashboard/app.py`.
+- Upgraded non-hard-limit defaults to `gpt-5.2-pro`/`gpt-5.2-codex` routes and hard-limit downgrade target to `gpt-5-mini`.
+- Extended budget ledger entries with `route_key`, `requested_model`, `fallback_hops`, and `selection_note`.
+- Updated docs and defaults: `state/AI_CONFIG.yaml`, `README.md`, `docs/WORKFLOW.md`, `docs/README_FILE_INDEX.zh-CN.md`, `docs/DATA_MODEL.md`.
+- Verification:
+  - `python3 -m pytest -q` -> 45 passed, 1 skipped.
+  - `python3 -m workflow verify` -> PASS (`artifacts/test/verify-20260221-2038.md`).
+  - `python3 -m workflow audit` -> P0=0/P1=0/P2=0 (`artifacts/audit/20260221-2038.md`).
+- Citation integrity update:
+  - Refreshed `state/tasks/T-0015/evidence_map.yaml` `source_sha256` for `docs/WORKFLOW.md` after document edits.

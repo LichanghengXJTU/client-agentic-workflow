@@ -267,9 +267,36 @@ def ensure_minimum_state_files() -> None:
         atomic_write_yaml(
             AI_CONFIG_PATH,
             {
-                "default_model": "gpt-5",
-                "low_cost_model": "gpt-4.1-mini",
-                "reasoning_effort": "high",
+                "version": 2,
+                "models": {
+                    "pro": "gpt-5.2-pro",
+                    "codex": "gpt-5.2-codex",
+                },
+                "routing": {
+                    "plan": "pro",
+                    "audit": "pro",
+                    "task_type": {
+                        "code": "codex",
+                        "derivation": "pro",
+                        "writing": "pro",
+                        "literature": "pro",
+                        "meta": "pro",
+                        "experiment": {
+                            "design": "pro",
+                            "run": "codex",
+                        },
+                    },
+                },
+                "fallback_chains": {
+                    "pro": ["gpt-5.2-pro", "gpt-5-pro", "gpt-5.2", "gpt-5.1", "gpt-5", "gpt-5-mini"],
+                    "codex": ["gpt-5.2-codex", "gpt-5.1-codex-max", "gpt-5.1-codex", "gpt-5-codex", "gpt-5.2", "gpt-5-mini"],
+                },
+                "effort_by_route": {
+                    "pro": "xhigh",
+                    "codex": "xhigh",
+                    "hard_limit": "high",
+                },
+                "hard_limit_model": "gpt-5-mini",
                 "price_per_1m_input_usd": 10.0,
                 "price_per_1m_output_usd": 30.0,
                 "price_per_1m_cached_input_usd": 2.5,

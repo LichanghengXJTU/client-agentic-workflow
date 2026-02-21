@@ -38,25 +38,20 @@ def test_ai_plan_missing_key_creates_pending_output(tmp_path: Path, monkeypatch)
 
     result = run_ai_plan(prompt="hello", output_path="state/PLAN.md")
     assert not result.ok
+    assert result.route_key == "pro"
+    assert result.requested_model == "gpt-5.2-pro"
     assert "OPENAI_API_KEY" in result.text
     assert (tmp_path / "state" / "PLAN.md").exists()
 
+    budget = read_yaml(tmp_path / "state" / "AI_BUDGET.yaml")
+    assert budget["entries"]
+    assert budget["entries"][-1]["route_key"] == "pro"
 
-def test_ai_plan_hard_limit_downgrades_model(tmp_path: Path, monkeypatch) -> None:
+
+def test_ai_plan_hard_limit_downgrades_model_to_gpt_5_mini(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     (tmp_path / "state").mkdir()
 
-    atomic_write_yaml(
-        tmp_path / "state" / "AI_CONFIG.yaml",
-        {
-            "default_model": "gpt-5",
-            "low_cost_model": "gpt-4.1-mini",
-            "reasoning_effort": "high",
-            "price_per_1m_input_usd": 10.0,
-            "price_per_1m_output_usd": 30.0,
-            "price_per_1m_cached_input_usd": 2.5,
-        },
-    )
     atomic_write_yaml(
         tmp_path / "state" / "AI_BUDGET.yaml",
         {
@@ -74,7 +69,14 @@ def test_ai_plan_hard_limit_downgrades_model(tmp_path: Path, monkeypatch) -> Non
 
     result = run_ai_plan(prompt="build plan", output_path="state/PLAN.md")
     assert result.ok
-    assert result.model == "gpt-4.1-mini"
+    assert result.route_key == "pro"
+    assert result.requested_model == "gpt-5-mini"
+    assert result.model == "gpt-5-mini"
+    assert "hard_limit_reached_downgraded" in result.selection_note
 
     budget = read_yaml(tmp_path / "state" / "AI_BUDGET.yaml")
     assert budget["entries"]
+    entry = budget["entries"][-1]
+    assert entry["requested_model"] == "gpt-5-mini"
+    assert entry["route_key"] == "pro"
+    assert entry["fallback_hops"] == 0

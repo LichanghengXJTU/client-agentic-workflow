@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .ai import run_ai_audit, run_ai_plan
+from .ai import run_ai_audit, run_ai_plan, run_ai_task
 from .audit import run_audit
 from .checkpoint import create_checkpoint, list_checkpoints
 from .git_ops import fetch, get_status, list_checkpoint_tags, pull_rebase, remote_exists
@@ -24,6 +24,7 @@ from .state_ops import (
     load_tasks,
     read_yaml,
     sync_review_queue_from_tasks,
+    task_by_id,
     update_task,
 )
 from .task_ops import TASK_ROLES, run_task_command
@@ -475,6 +476,42 @@ def cmd_ai_audit(args: argparse.Namespace) -> int:
     return 0 if result.ok else 1
 
 
+def cmd_ai_task(args: argparse.Namespace) -> int:
+    extra = _read_optional_file(args.input_file)
+    task = task_by_id(args.id)
+    intent = args.intent
+    prompt = args.prompt or (
+        "请围绕以下任务输出可执行、可验证、可回滚的工作结果。\\n\\n"
+        f"TASK:\\n{json.dumps(task, ensure_ascii=False, indent=2)}\\n\\n"
+        f"INTENT:\\n{intent or 'design'}\\n\\n"
+        f"EXTRA:\\n{extra}\\n"
+    )
+    result = run_ai_task(
+        task_id=args.id,
+        intent=intent,
+        prompt=prompt,
+        output_path=args.output,
+    )
+    append_state_event(
+        "AI Task",
+        [
+            f"Task: {args.id}",
+            f"Route: {result.route_key}",
+            f"Requested model: {result.requested_model}",
+            f"Model: {result.model}",
+            f"Selection note: {result.selection_note}",
+            f"Output: {result.output_path}",
+            f"Budget spend USD: {result.spend_usd}",
+            f"Budget ratio: {result.budget_ratio:.3f}",
+            f"Message: {result.message}",
+        ],
+    )
+    _print(result.__dict__)
+    if not result.ok and "missing" in result.message.lower():
+        return 0
+    return 0 if result.ok else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m workflow")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -721,6 +758,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_ai_audit.add_argument("--prompt", help="Custom prompt override")
     p_ai_audit.add_argument("--input-file", help="Optional file appended into prompt context")
     p_ai_audit.set_defaults(func=cmd_ai_audit)
+
+    p_ai_task = ai_sub.add_parser("task", help="Generate task-aware AI output with routed model selection")
+    p_ai_task.add_argument("--id", required=True, help="Task id like T-0015")
+    p_ai_task.add_argument("--intent", choices=["design", "run"], help="Optional task intent for experiment routing")
+    p_ai_task.add_argument("--prompt", help="Custom prompt override")
+    p_ai_task.add_argument("--input-file", help="Optional file appended into prompt context")
+    p_ai_task.add_argument("--output", help="Optional output path override")
+    p_ai_task.set_defaults(func=cmd_ai_task)
 
     return parser
 

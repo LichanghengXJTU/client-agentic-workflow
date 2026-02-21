@@ -44,3 +44,15 @@ runs:
   role: retriever
   run_meta_path: artifacts/tasks/T-0015/runs/RUN-20260221-173825584102/run_meta.yaml
   status: success
+- run_id: RUN-20260221-203403708173
+  role: retriever
+  run_meta_path: artifacts/tasks/T-0015/runs/RUN-20260221-203403708173/run_meta.yaml
+  status: success
+- run_id: RUN-20260221-203445143105
+  role: retriever
+  run_meta_path: artifacts/tasks/T-0015/runs/RUN-20260221-203445143105/run_meta.yaml
+  status: success
+- run_id: RUN-20260221-203810117071
+  role: retriever
+  run_meta_path: artifacts/tasks/T-0015/runs/RUN-20260221-203810117071/run_meta.yaml
+  status: success
