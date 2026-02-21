@@ -4,6 +4,10 @@
 - Planner: `prompts/planner.md`
 - Auditor: `prompts/auditor.md`
 - Reflector: `prompts/reflector.md`
+- Retriever: `prompts/retriever.md`
+- Implementer: `prompts/implementer.md`
+- Scribe: `prompts/scribe.md`
+- Critic: `prompts/critic.md`
 
 ## 管理规则
 - 提示词必须版本化（通过 Git 跟踪）。

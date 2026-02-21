@@ -1,0 +1,18 @@
+task_id: T-0015
+handoffs:
+- from_role: planner
+  to_role: retriever
+  checklist:
+  - brief.yaml 完整
+  - assumptions 已标注 uncertain
+  status: accepted
+  accepted_by: retriever
+  accepted_at: '2026-02-21T04:50:18'
+- from_role: critic
+  to_role: scribe
+  checklist:
+  - 审计与验证报告已生成
+  - 关键结论与证据映射已更新
+  status: accepted
+  accepted_by: scribe
+  accepted_at: '2026-02-21T04:51:45'

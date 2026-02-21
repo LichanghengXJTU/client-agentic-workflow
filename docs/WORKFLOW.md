@@ -88,6 +88,22 @@ python3 -m workflow ai audit
 - 预算账本：`state/AI_BUDGET.yaml`
 - 80% 预警，100% 自动降级模型。
 
+## 8.5 Task Role Run（run_meta）
+```bash
+python3 -m workflow task run --id T-0015 --role implementer --cmd "python -m workflow verify"
+```
+- 任务级 state：`state/tasks/<task_id>/`
+- 运行元数据：`artifacts/tasks/<task_id>/runs/<run_id>/run_meta.yaml`
+
+## 8.6 KB Ingest/Query
+```bash
+python3 -m workflow kb ingest --task T-0015 --src docs --src literature
+python3 -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
+```
+- 配置：`state/KB_CONFIG.yaml`
+- 清单：`state/KB_MANIFEST.yaml`
+- 索引：`artifacts/kb/index/`
+
 ## 9. Dashboard
 ```bash
 streamlit run dashboard/app.py

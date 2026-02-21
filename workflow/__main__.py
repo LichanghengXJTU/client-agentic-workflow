@@ -11,6 +11,7 @@ from .audit import run_audit
 from .checkpoint import create_checkpoint, list_checkpoints
 from .git_ops import fetch, get_status, list_checkpoint_tags, pull_rebase, remote_exists
 from .jobs import list_jobs, start_job, stop_job, tail_job_log
+from .kb_ops import ingest_kb_sources, query_kb
 from .pr_ops import close_superseded_prs, current_pr_context, list_prs, open_pr, update_pr
 from .project_ops import add_project, list_projects, scaffold_project, update_project as update_project_record
 from .release_ops import bootstrap_release_repo, open_release_pr, publish_project_release
@@ -25,6 +26,7 @@ from .state_ops import (
     sync_review_queue_from_tasks,
     update_task,
 )
+from .task_ops import TASK_ROLES, run_task_command
 from .verify import run_verify
 
 
@@ -235,6 +237,44 @@ def cmd_jobs_stop(args: argparse.Namespace) -> int:
 
 def cmd_jobs_logs(args: argparse.Namespace) -> int:
     _print({"id": args.id, "logs": tail_job_log(args.id, lines=args.lines)})
+    return 0
+
+
+def cmd_task_run(args: argparse.Namespace) -> int:
+    result = run_task_command(
+        task_id=args.id,
+        role=args.role,
+        command=args.cmd,
+        workdir=args.workdir,
+        seed=args.seed,
+    )
+    _print(result.__dict__)
+    return 0 if result.exit_code == 0 else 1
+
+
+def cmd_kb_ingest(args: argparse.Namespace) -> int:
+    result = ingest_kb_sources(
+        sources=args.src or [],
+        task_id=args.task,
+        external_root=args.external_root,
+        purpose=args.purpose,
+        trust_level=args.trust_level,
+        license_name=args.license,
+    )
+    _print(result.__dict__)
+    return 0
+
+
+def cmd_kb_query(args: argparse.Namespace) -> int:
+    result = query_kb(
+        query=args.q,
+        task_id=args.task,
+        top_k=args.top_k,
+        purpose=args.purpose,
+        trust_level=args.trust_level,
+        license_name=args.license,
+    )
+    _print({"report_path": result.report_path, "hits": result.hits})
     return 0
 
 
@@ -557,6 +597,38 @@ def build_parser() -> argparse.ArgumentParser:
     p_jobs_logs.add_argument("--id", required=True)
     p_jobs_logs.add_argument("--lines", type=int, default=80)
     p_jobs_logs.set_defaults(func=cmd_jobs_logs)
+
+    p_task = sub.add_parser("task", help="Task-level role run metadata and execution helpers")
+    task_sub = p_task.add_subparsers(dest="task_cmd", required=True)
+
+    p_task_run = task_sub.add_parser("run", help="Run a command under a task role and record run_meta")
+    p_task_run.add_argument("--id", required=True, help="Task id like T-0015")
+    p_task_run.add_argument("--role", required=True, choices=sorted(TASK_ROLES))
+    p_task_run.add_argument("--cmd", required=True, help="Shell command to execute")
+    p_task_run.add_argument("--workdir", default=None, help="Working directory for command")
+    p_task_run.add_argument("--seed", type=int, default=None, help="Optional reproducibility seed")
+    p_task_run.set_defaults(func=cmd_task_run)
+
+    p_kb = sub.add_parser("kb", help="Knowledge-base ingest/chunk/index/query operations")
+    kb_sub = p_kb.add_subparsers(dest="kb_cmd", required=True)
+
+    p_kb_ingest = kb_sub.add_parser("ingest", help="Ingest files into KB manifest and index")
+    p_kb_ingest.add_argument("--task", help="Optional task id for run_meta binding")
+    p_kb_ingest.add_argument("--src", action="append", required=True, help="Source file/dir (repeatable)")
+    p_kb_ingest.add_argument("--external-root", help="Optional external root for oversized files")
+    p_kb_ingest.add_argument("--purpose", default="background")
+    p_kb_ingest.add_argument("--trust-level", default="medium")
+    p_kb_ingest.add_argument("--license", default="unknown")
+    p_kb_ingest.set_defaults(func=cmd_kb_ingest)
+
+    p_kb_query = kb_sub.add_parser("query", help="Query KB index and return citations")
+    p_kb_query.add_argument("--task", help="Optional task id for run_meta binding")
+    p_kb_query.add_argument("--q", required=True, help="Query text")
+    p_kb_query.add_argument("--top-k", type=int, default=8)
+    p_kb_query.add_argument("--purpose")
+    p_kb_query.add_argument("--trust-level")
+    p_kb_query.add_argument("--license")
+    p_kb_query.set_defaults(func=cmd_kb_query)
 
     p_pr = sub.add_parser("pr", help="Open/update/list/close superseded pull requests via gh CLI")
     pr_sub = p_pr.add_subparsers(dest="pr_cmd", required=True)

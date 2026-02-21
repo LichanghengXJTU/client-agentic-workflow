@@ -1,0 +1,35 @@
+run_id: RUN-20260221-045137904489
+task_id: T-0015
+role: retriever
+started_at: '2026-02-21T04:51:37'
+ended_at: '2026-02-21T04:51:37'
+command: /Users/lienhui/Desktop/client/.venv/bin/python -m workflow kb query --task
+  T-0015 --q 'workflow verify' --top-k 3
+args:
+- --task
+- T-0015
+- --q
+- workflow verify
+- --top-k
+- '3'
+workdir: .
+environment:
+  python: 3.13.7
+  platform: macOS-14.4-arm64-arm-64bit-Mach-O
+  key_presence:
+    OPENAI_API_KEY: absent
+seed: null
+inputs:
+- path: state/KB_MANIFEST.yaml
+  sha256: sha256:3d2d8e9498fa5c03ce26972c43691bb827530ab829512ed4af0dd57c58f66331
+- path: artifacts/kb/index/inverted.json
+  sha256: sha256:f9114d9aee1afc24983dc110a54b1f58e402e5fd7a7d82de130c909c9fe8e6d2
+- path: artifacts/kb/index/chunk_meta.jsonl
+  sha256: sha256:9000db982ef46bd58f1a1e6a0f5e458a69750977098fd62eedc7fb4a801bf10d
+outputs:
+- path: artifacts/tasks/T-0015/outputs/query-20260221-045137.yaml
+  sha256: sha256:69df15c258c8085b67e206de85dd50a7051cde85c4312f9c4544b556e9e7a117
+exit_code: 0
+logs:
+  stdout: artifacts/tasks/T-0015/runs/RUN-20260221-045137904489/stdout.log
+  stderr: artifacts/tasks/T-0015/runs/RUN-20260221-045137904489/stderr.log

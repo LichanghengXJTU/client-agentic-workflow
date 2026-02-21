@@ -1,0 +1,10 @@
+doc_id: DOC-3b24d521
+summary: '# Q-learning and Bellman Optimality Relation  ## Update rule For one sampled
+  transition \((s_t, a_t, r_t, s_{t+1})\), tabular Q-learning updates:  \[ Q_{t+1}(s_t,
+  a_t) = (1 - \alph This project uses a finite deterministic Gridworld and bounded
+  rewards. Under sufficient exploration and Robbins-Monro style step-size conditions,
+  tabular Q-learning converges to \'
+key_points:
+- Q-learning and Bellman Optimality Relation
+- Q-learning and Bellman Optimality Relation
+open_risks: []

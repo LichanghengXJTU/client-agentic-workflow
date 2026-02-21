@@ -1,0 +1,253 @@
+documents:
+- doc_id: DOC-0556811c
+  source_uri: file:///Users/lienhui/Desktop/client/literature/notes/README.md
+  local_path: literature/notes/README.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 224
+  mtime_epoch: 1771606397.1127322
+  sha256: sha256:a681ddc9f862187cbbf4c3795e3a1d046600bcaa7bd9e5983297fc10f5c91283
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-0556811c.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-0556811c.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-0f2ff4a4
+  source_uri: file:///Users/lienhui/Desktop/client/docs/DATA_MODEL.md
+  local_path: docs/DATA_MODEL.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 5087
+  mtime_epoch: 1771620455.989323
+  sha256: sha256:90f94e5e95898aa9c110b47b85e4bc9043acf440268f6ee7a662a680ee1c8405
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-0f2ff4a4.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-0f2ff4a4.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-14dcdf16
+  source_uri: file:///Users/lienhui/Desktop/client/docs/AI_PROMPTS.md
+  local_path: docs/AI_PROMPTS.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 709
+  mtime_epoch: 1771620472.9524846
+  sha256: sha256:5462f4e631c1e17c1e9804a8845245390a72fae6d8ef9f1789f691efabbde60a
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-14dcdf16.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-14dcdf16.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-38159754
+  source_uri: file:///Users/lienhui/Desktop/client/docs/KB_WORKFLOW.md
+  local_path: docs/KB_WORKFLOW.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 1675
+  mtime_epoch: 1771620403.780388
+  sha256: sha256:b5230e394b45b466b370eb6aaf3fd48f99f8bd9835f55810e0fffcf84496e34c
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-38159754.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-38159754.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-3b24d521
+  source_uri: file:///Users/lienhui/Desktop/client/projects/rl-gridworld-qlearning/derivations/q_learning_bellman_relation.md
+  local_path: projects/rl-gridworld-qlearning/derivations/q_learning_bellman_relation.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 1303
+  mtime_epoch: 1771614519.8025696
+  sha256: sha256:4bd608a2cc67940d46e0a9e31aee5310465f49050d9b91ecfc9a1ee936d93794
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-3b24d521.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-3b24d521.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-85e276f6
+  source_uri: file:///Users/lienhui/Desktop/client/docs/GOVERNANCE.md
+  local_path: docs/GOVERNANCE.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 1232
+  mtime_epoch: 1771606397.1121511
+  sha256: sha256:26f4ab215b80ba2bb8adfcc6db9c1a54d7ba70342ebd194bd6736fa16980a1b3
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-85e276f6.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-85e276f6.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-b76f66e4
+  source_uri: file:///Users/lienhui/Desktop/client/docs/WORKFLOW.md
+  local_path: docs/WORKFLOW.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 4568
+  mtime_epoch: 1771620467.2074711
+  sha256: sha256:5b488a9c06eb2f5dea44aa0c9fbf89ddee5cc5ed35decf128535e530a2715bf8
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-b76f66e4.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-b76f66e4.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-d5a222b2
+  source_uri: file:///Users/lienhui/Desktop/client/projects/rl-gridworld-qlearning/derivations/q_learning_bellman_check.py
+  local_path: projects/rl-gridworld-qlearning/derivations/q_learning_bellman_check.py
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 1719
+  mtime_epoch: 1771614519.804341
+  sha256: sha256:14dc283faa14b0c43651ec8ae0ebf787a115174ff6ade1c5410682c0924825cc
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-d5a222b2.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-d5a222b2.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-dcdcf99a
+  source_uri: file:///Users/lienhui/Desktop/client/derivations/examples/lemma1_check.py
+  local_path: derivations/examples/lemma1_check.py
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 361
+  mtime_epoch: 1771606397.1117365
+  sha256: sha256:cec3a6dd892f31e79ebe5d915bfb7198e56f251ccf599afff307c860a85883b5
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-dcdcf99a.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-dcdcf99a.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-def6e824
+  source_uri: file:///Users/lienhui/Desktop/client/derivations/examples/lemma1.md
+  local_path: derivations/examples/lemma1.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 317
+  mtime_epoch: 1771606397.1116264
+  sha256: sha256:67ac766a1be5f97d7a9ccd761f634985e4e743dd353831b89c3f7d5945401da5
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-def6e824.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-def6e824.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-ef3bfead
+  source_uri: file:///Users/lienhui/Desktop/client/docs/TASK_WORKFLOW.md
+  local_path: docs/TASK_WORKFLOW.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 1588
+  mtime_epoch: 1771620390.688111
+  sha256: sha256:bfb62f8a9caf9c5c898c8bb1a4c0e7ce63ca469680ce2423556b3eb94b406cd1
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-ef3bfead.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-ef3bfead.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl
+- doc_id: DOC-fa16fb47
+  source_uri: file:///Users/lienhui/Desktop/client/derivations/README.md
+  local_path: derivations/README.md
+  collected_at: '2026-02-21T04:50:18'
+  last_seen_at: '2026-02-21T04:50:18'
+  version: git:4e329bf7
+  purpose: background
+  trust_level: medium
+  license: unknown
+  storage: repo
+  external_root: ''
+  size_bytes: 493
+  mtime_epoch: 1771606397.1114755
+  sha256: sha256:bb1d58396c3a4953869ccdfa9b93a1d85308eb3277f0799362a562d5cccea6d0
+  status: active
+  processed:
+    chunks_path: artifacts/kb/processed/chunks/DOC-fa16fb47.jsonl
+    doc_summary_path: artifacts/kb/summaries/doc/DOC-fa16fb47.yaml
+    index_refs:
+    - artifacts/kb/index/inverted.json
+    - artifacts/kb/index/chunk_meta.jsonl

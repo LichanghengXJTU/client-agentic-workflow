@@ -13,11 +13,14 @@ KR_STATUS_SET = {"proposed", "verified", "deprecated"}
 CONFIDENCE_SET = {"low", "medium", "high"}
 PROJECT_STATUS_SET = {"active", "archived", "draft"}
 VISIBILITY_SET = {"public", "private", "internal"}
+KB_STORAGE_SET = {"repo", "external"}
+KB_DOC_STATUS_SET = {"active", "deprecated"}
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 TASK_ID_RE = re.compile(r"^T-\d{4}$")
 KR_ID_RE = re.compile(r"^KR-\d{4}$")
 PROJECT_ID_RE = re.compile(r"^P-\d{4}$")
+DOC_ID_RE = re.compile(r"^DOC-[a-f0-9]{6,}$")
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 
@@ -430,6 +433,176 @@ def validate_project_registry_data(data: dict[str, Any]) -> tuple[bool, list[Val
                         path=f"{base}.{key}",
                         message=f"`{key}` must be YYYY-MM-DD.",
                         suggestion=f"Set `{key}` like `2026-02-21`.",
+                    )
+                )
+
+    return len(issues) == 0, issues
+
+
+def validate_kb_manifest_data(data: dict[str, Any]) -> tuple[bool, list[ValidationIssue]]:
+    issues: list[ValidationIssue] = []
+    documents = data.get("documents")
+    if not isinstance(documents, list):
+        issues.append(
+            ValidationIssue(
+                path="documents",
+                message="`documents` must be a list.",
+                suggestion="Set top-level key as `documents: []`.",
+            )
+        )
+        return False, issues
+
+    seen_doc_ids: set[str] = set()
+    for idx, item in enumerate(documents):
+        base = f"documents[{idx}]"
+        if not isinstance(item, dict):
+            issues.append(
+                ValidationIssue(
+                    path=base,
+                    message="Each document item must be a mapping.",
+                    suggestion="Use YAML mapping with required manifest fields.",
+                )
+            )
+            continue
+
+        required = [
+            "doc_id",
+            "source_uri",
+            "local_path",
+            "collected_at",
+            "version",
+            "purpose",
+            "trust_level",
+            "license",
+            "storage",
+            "external_root",
+            "size_bytes",
+            "sha256",
+            "status",
+            "processed",
+        ]
+        for key in required:
+            if key not in item:
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.{key}",
+                        message=f"Missing required field `{key}`.",
+                        suggestion=f"Add `{key}` according to docs/KB_WORKFLOW.md and docs/DATA_MODEL.md.",
+                    )
+                )
+
+        doc_id = item.get("doc_id")
+        if not isinstance(doc_id, str) or not DOC_ID_RE.match(doc_id):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.doc_id",
+                    message="`doc_id` must match pattern `DOC-<hex>`.",
+                    suggestion="Set doc_id like `DOC-7f3ab2`.",
+                )
+            )
+        elif doc_id in seen_doc_ids:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.doc_id",
+                    message=f"Duplicate doc_id `{doc_id}`.",
+                    suggestion="Ensure each document id is unique.",
+                )
+            )
+        else:
+            seen_doc_ids.add(doc_id)
+
+        for key in ["source_uri", "local_path", "collected_at", "version", "purpose", "license", "external_root"]:
+            if not isinstance(item.get(key), str):
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.{key}",
+                        message=f"`{key}` must be a string.",
+                        suggestion=f"Set `{key}` as text value.",
+                    )
+                )
+
+        if item.get("trust_level") not in CONFIDENCE_SET:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.trust_level",
+                    message=f"`trust_level` must be one of {sorted(CONFIDENCE_SET)}.",
+                    suggestion="Use low/medium/high.",
+                )
+            )
+
+        if item.get("storage") not in KB_STORAGE_SET:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.storage",
+                    message=f"`storage` must be one of {sorted(KB_STORAGE_SET)}.",
+                    suggestion="Use repo/external.",
+                )
+            )
+
+        size_bytes = item.get("size_bytes")
+        if not isinstance(size_bytes, int) or size_bytes < 0:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.size_bytes",
+                    message="`size_bytes` must be a non-negative integer.",
+                    suggestion="Set size_bytes using file size from stat().",
+                )
+            )
+
+        sha256_value = item.get("sha256")
+        if not isinstance(sha256_value, str) or not sha256_value.startswith("sha256:"):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.sha256",
+                    message="`sha256` must start with `sha256:`.",
+                    suggestion="Set sha256 to hex digest with prefix.",
+                )
+            )
+
+        if item.get("status") not in KB_DOC_STATUS_SET:
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.status",
+                    message=f"`status` must be one of {sorted(KB_DOC_STATUS_SET)}.",
+                    suggestion="Use active/deprecated.",
+                )
+            )
+
+        processed = item.get("processed")
+        if not isinstance(processed, dict):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.processed",
+                    message="`processed` must be a mapping.",
+                    suggestion="Set processed to mapping with chunks/doc_summary/index_refs.",
+                )
+            )
+            continue
+
+        for key in ["chunks_path", "doc_summary_path", "index_refs"]:
+            if key not in processed:
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.processed.{key}",
+                        message=f"Missing required field `{key}` in processed.",
+                        suggestion=f"Add processed.{key} according to KB workflow.",
+                    )
+                )
+        if "index_refs" in processed and not _is_list_of_str(processed.get("index_refs")):
+            issues.append(
+                ValidationIssue(
+                    path=f"{base}.processed.index_refs",
+                    message="`processed.index_refs` must be list of strings.",
+                    suggestion="Use YAML string list for index references.",
+                )
+            )
+        for key in ["chunks_path", "doc_summary_path"]:
+            if key in processed and not isinstance(processed.get(key), str):
+                issues.append(
+                    ValidationIssue(
+                        path=f"{base}.processed.{key}",
+                        message=f"`processed.{key}` must be string.",
+                        suggestion=f"Set processed.{key} to file path or empty string.",
                     )
                 )
 

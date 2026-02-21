@@ -1,0 +1,18 @@
+task_id: T-0015
+claims:
+- claim_id: CL-0001
+  statement: workflow 已具备任务级 run_meta 与 KB ingest/query 的可审计闭环。
+  linked_key_results:
+  - KR-0009
+  confidence: high
+  evidence:
+  - cite: docs/WORKFLOW.md#L51
+    source_sha256: sha256:5b488a9c06eb2f5dea44aa0c9fbf89ddee5cc5ed35decf128535e530a2715bf8
+    note: WORKFLOW 文档已包含 verify/audit 与 task/kb 命令落点
+  - cite: docs/TASK_WORKFLOW.md#L1
+    source_sha256: sha256:bfb62f8a9caf9c5c898c8bb1a4c0e7ce63ca469680ce2423556b3eb94b406cd1
+    note: 任务级模板与交接规则
+  verification:
+  - command: .venv/bin/python -m workflow kb query --task T-0015 --q 'workflow verify'
+    run_id: RUN-20260221-045130813155
+  status: verified

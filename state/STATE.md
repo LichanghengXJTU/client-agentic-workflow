@@ -228,3 +228,35 @@
 - Tag: `cp-20260220-1918-rl-gridworld-qlearning-c`
 - Snapshot commit: `8e03dc5b2ca65d995ef4e8c3bf6fe41b37557990`
 - Summary: rl-gridworld-qlearning-closure
+
+## Task Updated
+- Task: T-0012
+- Status: done
+
+## Task Added
+- Task: T-0015
+- Title: 实现 Phase C：任务结构化记录 + KB ingest/query + audit/verify 护栏
+
+## Phase C Implementation (2026-02-21)
+- Implemented `workflow kb ingest/query` and `workflow task run` CLI commands.
+- Added task-level state/artifact scaffolding (`state/tasks/<task_id>/`, `artifacts/tasks/<task_id>/runs/...`).
+- Added KB/citation/task modules: `workflow/kb_ops.py`, `workflow/citation_ops.py`, `workflow/task_ops.py`.
+- Added governance docs and prompts: `docs/TASK_WORKFLOW.md`, `docs/KB_WORKFLOW.md`, `prompts/retriever.md`, `prompts/implementer.md`, `prompts/scribe.md`, `prompts/critic.md`.
+- Extended audit/verify guardrails for task artifacts, citation validity, handoff integrity, run_meta completeness, and KB manifest checks.
+- Verification:
+  - `.venv/bin/python -m pytest -q` (35 passed)
+  - `.venv/bin/python -m workflow verify` (PASS, report: `artifacts/test/verify-20260221-0456.md`)
+  - `.venv/bin/python -m workflow audit` (P0=0, P1=0, P2=0, report: `artifacts/audit/20260221-0456.md`)
+
+## Documentation Update (2026-02-21)
+- Added comprehensive root `README.md` (Chinese-first with English technical terms) covering architecture, workflow principles, user operations, quality gates, and ChatGPT evaluation pack.
+- Added deep appendix `docs/README_FILE_INDEX.zh-CN.md` with file-level responsibility matrix and full `artifacts/` index grouped by domain.
+- Validation executed:
+  - `.venv/bin/python -m pytest -q` -> 35 passed.
+  - `.venv/bin/python -m workflow verify` -> PASS (`artifacts/test/verify-20260221-1738.md`).
+  - `.venv/bin/python -m workflow audit` -> P0=0, P1=0, P2=0 (`artifacts/audit/20260221-1738.md`).
+- Security checks:
+  - Confirmed `state/AI_SECRETS.local.yaml` remains gitignored.
+  - No secret-value pattern found in tracked files selected for commit.
+- KEY_RESULTS decision:
+  - No new critical conclusion introduced in this round; `state/KEY_RESULTS.yaml` was not updated by documentation-only logic.

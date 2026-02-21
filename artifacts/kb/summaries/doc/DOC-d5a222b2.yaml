@@ -1,0 +1,7 @@
+doc_id: DOC-d5a222b2
+summary: 'from __future__ import annotations  import numpy as np   def bellman_optimality_operator(q:
+  np.ndarray, r: np.ndarray, p: np.ndarray, gamma: float) -> np.ndarray:     # q shape:
+  [S assert lhs <= rhs, f"Contraction violated: lhs={lhs}, rhs={rhs}"   def sampled_update_matches_target()
+  -> None:     gamma = 0.95     q = np.array(         [             [0.5, -0.2,'
+key_points: []
+open_risks: []

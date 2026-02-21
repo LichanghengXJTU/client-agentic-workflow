@@ -1,0 +1,7 @@
+doc_id: DOC-14dcdf16
+summary: '# AI_PROMPTS / 提示词治理  ## Prompt Files - Planner: `prompts/planner.md` -
+  Auditor: `prompts/auditor.md` - Reflector: `prompts/reflector.md` - Retriever: `prompts/retriever.md`
+  - Impl'
+key_points:
+- AI_PROMPTS / 提示词治理
+open_risks: []

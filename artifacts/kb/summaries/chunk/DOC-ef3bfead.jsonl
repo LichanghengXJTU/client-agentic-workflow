@@ -1,0 +1,1 @@
+{"chunk_id": "CHK-0001", "summary": "# TASK WORKFLOW / 任务级结构化协作规范  ## 1. Goal - 在不新增顶层并行体系的前提下，为每个任务提供可审计、可复现、可交接的结构化记录。 - 所有任务级结构默认落在 `state/tasks/<task_id>/` 与 `artifacts/tasks/<task_id>/`。  ## 2. Required Files - `"}

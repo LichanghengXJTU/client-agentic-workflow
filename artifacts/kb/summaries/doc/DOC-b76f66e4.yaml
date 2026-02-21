@@ -1,0 +1,13 @@
+doc_id: DOC-b76f66e4
+summary: '# WORKFLOW 使用说明 / Daily Playbook  ## 1. 安装 ```bash python3 -m pip install
+  -r requirements.txt ```  ## 2. 每天开始（双电脑通用） ```bash python3 -m workflow sync python3
+  -m workflow status ``` Reject 会触发安全级联重启（rollback 分支 + revert + 任务重置 + 关闭 superseded
+  PR）。  ## 4.5 项目注册（Project Registry） ```bash python3 -m workflow project list python3
+  -m workflow project scaffold --slu - `release publish` 仅导出项目目录 `projects/<slug>/`，不会发布整个源仓库。
+  - 发布 PR 会记录到 `state/PR_REGISTRY.yaml`，并标记 `role: release`。  ## 5. 验证与审计 ```bash
+  python3 -m workflow verify python3 -m work'
+key_points:
+- WORKFLOW 使用说明 / Daily Playbook
+- WORKFLOW 使用说明 / Daily Playbook
+- WORKFLOW 使用说明 / Daily Playbook
+open_risks: []

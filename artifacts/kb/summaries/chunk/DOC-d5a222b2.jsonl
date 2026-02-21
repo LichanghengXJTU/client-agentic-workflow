@@ -1,0 +1,2 @@
+{"chunk_id": "CHK-0001", "summary": "from __future__ import annotations  import numpy as np   def bellman_optimality_operator(q: np.ndarray, r: np.ndarray, p: np.ndarray, gamma: float) -> np.ndarray:     # q shape: [S"}
+{"chunk_id": "CHK-0002", "summary": "    assert lhs <= rhs, f\"Contraction violated: lhs={lhs}, rhs={rhs}\"   def sampled_update_matches_target() -> None:     gamma = 0.95     q = np.array(         [             [0.5, -"}

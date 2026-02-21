@@ -1,0 +1,2 @@
+{"chunk_id": "CHK-0001", "summary": "# KB WORKFLOW / 文件库与检索规范  ## 1. Scope - 复用现有目录：`state/` 管理清单，`artifacts/` 管理处理产物，`literature/` 保留人工文献入口。 - 不新增顶层 `knowledge_base/`。  ## 2. Core Paths - 配置：`state/KB_CONFIG.yaml` - "}
+{"chunk_id": "CHK-0002", "summary": "  - 有 task：`artifacts/tasks/<task_id>/outputs/query-*.yaml`   - 无 task：`artifacts/kb/query-*.yaml`  ## 6. Citation Integrity - 推荐格式：`path#L<line>`（可扩展范围格式）。 - 校验维度：路径存在、行号有效、`sourc"}

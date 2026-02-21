@@ -1,0 +1,25 @@
+task_id: T-0015
+title: 实现 Phase C：任务结构化记录 + KB ingest/query + audit/verify 护栏
+owner: codex
+goal: 在现有工作流内实现可审计的任务级记录与文件库能力，不引入并行顶层体系。
+success_criteria:
+- 新增 workflow kb ingest/query 与 workflow task run 命令
+- 新增任务级与 KB 模板文件并通过 schema/audit 检查
+- verify/audit 全部通过且报告可追溯
+scope_in:
+- workflow/ 下新增 kb/task/citation 相关能力
+- docs/ 与 prompts/ 补齐任务与 KB 规范
+- tests/ 补齐最小覆盖（ingest/query/task_run/citation）
+scope_out:
+- 不改现有 rollback/review-queue 语义
+- 不引入向量数据库或外部检索服务
+constraints:
+- 不新增顶层 tasks/ 或 knowledge_base/
+- 不记录任何 secrets 实际值
+- 引用必须支持 path+line 与 sha 校验
+long_inputs: []
+assumptions:
+- id: ASM-001
+  text: 当前阶段先使用倒排索引，不引入 embedding 索引。
+  status: resolved
+  tag: uncertain

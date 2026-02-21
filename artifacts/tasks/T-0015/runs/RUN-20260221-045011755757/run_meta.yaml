@@ -1,0 +1,26 @@
+run_id: RUN-20260221-045011755757
+task_id: T-0015
+role: implementer
+started_at: '2026-02-21T04:50:11'
+ended_at: '2026-02-21T04:50:11'
+command: echo phase-c-task-record-bootstrap
+args: []
+workdir: .
+environment:
+  python: 3.13.7
+  platform: macOS-14.4-arm64-arm-64bit-Mach-O
+  key_presence:
+    OPENAI_API_KEY: absent
+seed: null
+inputs:
+- path: state/tasks/T-0015/brief.yaml
+  sha256: sha256:10cc19c3ad48a0274e8d2536ed850e69e986f79d2bb25291d11880d21b77ff68
+- path: state/tasks/T-0015/handoff.yaml
+  sha256: sha256:1b076e61abb75b25cabc3515fac4f6ee8d34245d961fa60bd2f1e5650c9c5c89
+- path: state/tasks/T-0015/evidence_map.yaml
+  sha256: sha256:d3179a4c1d6ba9433855575beea7147a1b600ff06a4bb9dba30fa2f6d28d85fd
+outputs: []
+exit_code: 0
+logs:
+  stdout: artifacts/tasks/T-0015/runs/RUN-20260221-045011755757/stdout.log
+  stderr: artifacts/tasks/T-0015/runs/RUN-20260221-045011755757/stderr.log

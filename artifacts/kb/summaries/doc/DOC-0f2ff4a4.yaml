@@ -1,0 +1,12 @@
+doc_id: DOC-0f2ff4a4
+summary: '# DATA MODEL / 数据模型说明  ## TASKS.yaml ```yaml tasks:   - id: "T-0001"     title:
+  "..."     type: "derivation|code|writing|literature|experiment|meta"     priority:
+  "P0|P1|P2"     ow - id: "RQ-0001"     task_id: "T-0001"     title: "..."     status:
+  "pending|approve|rework|reject"     created_at: "YYYY-MM-DD"     updated_at: "YYYY-MM-DD"
+  ```  ## PR_REGISTRY.yam status: "running|stopped|exited"     log_path: "artifacts/test/job-J-0001.log"     workdir:
+  "."     started_at: "..."     updated_at: "..." ```  ## AI_BUDGET.yaml ```yaml monthly_b'
+key_points:
+- DATA MODEL / 数据模型说明
+- DATA MODEL / 数据模型说明
+- DATA MODEL / 数据模型说明
+open_risks: []

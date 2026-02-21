@@ -128,3 +128,27 @@ results:
   last_confirmed_commit: 8e03dc5b2ca65d995ef4e8c3bf6fe41b37557990
   checkpoint_tags:
   - cp-20260220-1918-rl-gridworld-qlearning-c
+- id: KR-0009
+  statement: Phase C 已落地：任务级结构化记录、KB ingest/query、citation 校验与 audit/verify 护栏形成闭环。
+  status: verified
+  confidence: high
+  evidence:
+  - workflow/__main__.py
+  - workflow/task_ops.py
+  - workflow/kb_ops.py
+  - workflow/citation_ops.py
+  - workflow/audit.py
+  - workflow/verify.py
+  - docs/TASK_WORKFLOW.md
+  - docs/KB_WORKFLOW.md
+  - artifacts/test/verify-20260221-0456.md
+  - artifacts/audit/20260221-0456.md
+  verification:
+  - .venv/bin/python -m pytest -q
+  - .venv/bin/python -m workflow verify
+  - .venv/bin/python -m workflow audit
+  related_tasks:
+  - T-0015
+  first_seen_commit: TBD
+  last_confirmed_commit: TBD
+  checkpoint_tags: []

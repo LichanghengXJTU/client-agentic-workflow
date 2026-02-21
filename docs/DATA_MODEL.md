@@ -96,6 +96,107 @@ spend_usd: 0.0
 entries: []
 ```
 
+## state/tasks/<task_id>/brief.yaml
+```yaml
+task_id: "T-0015"
+title: "..."
+owner: "codex|human"
+goal: "一句话目标"
+success_criteria: ["..."]
+scope_in: []
+scope_out: []
+constraints: []
+long_inputs:
+  - input_id: "IN-001"
+    path: "artifacts/tasks/T-0015/inputs/spec-v1.md"
+    source: "repo|external"
+    sha256: "sha256:..."
+assumptions:
+  - id: "ASM-001"
+    text: "..."
+    status: "open|resolved"
+    tag: "uncertain"
+```
+
+## state/tasks/<task_id>/evidence_map.yaml
+```yaml
+task_id: "T-0015"
+claims:
+  - claim_id: "CL-001"
+    statement: "可审计结论"
+    linked_key_results: ["KR-0009"]
+    confidence: "low|medium|high"
+    evidence:
+      - cite: "docs/WORKFLOW.md#L54"
+        source_sha256: "sha256:..."
+        note: "..."
+    verification:
+      - command: "python -m workflow verify"
+        run_id: "RUN-20260221-100001"
+    status: "proposed|verified|rejected"
+```
+
+## artifacts/tasks/<task_id>/runs/<run_id>/run_meta.yaml
+```yaml
+run_id: "RUN-20260221-100001"
+task_id: "T-0015"
+role: "planner|retriever|implementer|critic|scribe"
+started_at: "2026-02-21T10:00:01"
+ended_at: "2026-02-21T10:01:08"
+command: "python -m workflow kb query --task T-0015 --q workflow"
+args: ["--task", "T-0015"]
+workdir: "."
+environment:
+  python: "3.13.7"
+  platform: "Darwin-arm64"
+  key_presence:
+    OPENAI_API_KEY: "present|absent"
+seed: 42
+inputs:
+  - path: "state/tasks/T-0015/brief.yaml"
+    sha256: "sha256:..."
+outputs:
+  - path: "artifacts/tasks/T-0015/outputs/query-20260221-100108.yaml"
+    sha256: "sha256:..."
+exit_code: 0
+logs:
+  stdout: "artifacts/tasks/T-0015/runs/RUN-20260221-100001/stdout.log"
+  stderr: "artifacts/tasks/T-0015/runs/RUN-20260221-100001/stderr.log"
+```
+
+## KB_CONFIG.yaml
+```yaml
+external_roots: ["/Volumes/workflow-kb"]
+ignore_globs: ["**/.git/**", "**/.venv/**", "**/__pycache__/**"]
+max_repo_file_mb: 20
+chunk_policy:
+  default_max_chars: 1200
+  default_overlap_chars: 200
+```
+
+## KB_MANIFEST.yaml
+```yaml
+documents:
+  - doc_id: "DOC-7f3ab2"
+    source_uri: "file://literature/notes/2026-foo.md"
+    local_path: "literature/notes/2026-foo.md"
+    collected_at: "2026-02-21T10:20:00"
+    version: "git:8e03dc5b"
+    purpose: "background|policy|derivation|experiment"
+    trust_level: "low|medium|high"
+    license: "MIT|CC-BY|unknown"
+    storage: "repo|external"
+    external_root: ""
+    size_bytes: 18342
+    sha256: "sha256:..."
+    status: "active|deprecated"
+    processed:
+      chunks_path: "artifacts/kb/processed/chunks/DOC-7f3ab2.jsonl"
+      doc_summary_path: "artifacts/kb/summaries/doc/DOC-7f3ab2.yaml"
+      index_refs:
+        - "artifacts/kb/index/inverted.json"
+```
+
 ## Schema Enforcement
 - `workflow/schemas.py` 提供 TASKS / KEY_RESULTS 的强校验。
 - `python -m workflow audit` 若 schema 不合法会报 P0，并给修复建议。

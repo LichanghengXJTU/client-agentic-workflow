@@ -18,6 +18,8 @@ JOBS_PATH = STATE_DIR / "JOBS.yaml"
 AI_CONFIG_PATH = STATE_DIR / "AI_CONFIG.yaml"
 AI_BUDGET_PATH = STATE_DIR / "AI_BUDGET.yaml"
 PROJECT_REGISTRY_PATH = STATE_DIR / "PROJECT_REGISTRY.yaml"
+KB_CONFIG_PATH = STATE_DIR / "KB_CONFIG.yaml"
+KB_MANIFEST_PATH = STATE_DIR / "KB_MANIFEST.yaml"
 
 
 def now_iso() -> str:
@@ -223,6 +225,15 @@ def save_project_registry(items: list[dict[str, Any]], path: str | Path = PROJEC
     atomic_write_yaml(path, {"projects": items})
 
 
+def load_kb_manifest(path: str | Path = KB_MANIFEST_PATH) -> list[dict[str, Any]]:
+    data = read_yaml(path)
+    return data.get("documents", [])
+
+
+def save_kb_manifest(items: list[dict[str, Any]], path: str | Path = KB_MANIFEST_PATH) -> None:
+    atomic_write_yaml(path, {"documents": items})
+
+
 def ensure_minimum_state_files() -> None:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     defaults: list[tuple[Path, dict[str, Any]]] = [
@@ -231,6 +242,7 @@ def ensure_minimum_state_files() -> None:
         (KEY_RESULTS_PATH, {"results": []}),
         (PR_REGISTRY_PATH, {"prs": []}),
         (PROJECT_REGISTRY_PATH, {"projects": []}),
+        (KB_MANIFEST_PATH, {"documents": []}),
         (JOBS_PATH, {"jobs": []}),
         (
             AI_BUDGET_PATH,
@@ -262,5 +274,16 @@ def ensure_minimum_state_files() -> None:
                 "price_per_1m_output_usd": 30.0,
                 "price_per_1m_cached_input_usd": 2.5,
                 "notes": "Do not store API key here. Put key in state/AI_SECRETS.local.yaml or OPENAI_API_KEY env.",
+            },
+        )
+
+    if not KB_CONFIG_PATH.exists():
+        atomic_write_yaml(
+            KB_CONFIG_PATH,
+            {
+                "external_roots": ["/Volumes/workflow-kb"],
+                "ignore_globs": ["**/.git/**", "**/.venv/**", "**/__pycache__/**"],
+                "max_repo_file_mb": 20,
+                "chunk_policy": {"default_max_chars": 1200, "default_overlap_chars": 200},
             },
         )

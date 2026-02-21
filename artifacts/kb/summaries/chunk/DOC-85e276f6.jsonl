@@ -1,0 +1,1 @@
+{"chunk_id": "CHK-0001", "summary": "# GOVERNANCE / 审批与回档治理  ## 1. 人类审批优先级 - AI 可提案，Human 有最终裁决权。 - 所有待审事项进入 `state/REVIEW_QUEUE.yaml`。  ## 2. 审批动作定义 - Approve: 任务通过，状态变更为 `done`。 - Rework: 任务返工，状态变更为 `blocked`（等待重新执行"}

@@ -1,0 +1,26 @@
+run_id: RUN-20260221-045338037268
+task_id: T-0015
+role: critic
+started_at: '2026-02-21T04:53:34'
+ended_at: '2026-02-21T04:53:38'
+command: .venv/bin/python -m workflow verify
+args: []
+workdir: .
+environment:
+  python: 3.13.7
+  platform: macOS-14.4-arm64-arm-64bit-Mach-O
+  key_presence:
+    OPENAI_API_KEY: absent
+seed: null
+inputs:
+- path: state/tasks/T-0015/brief.yaml
+  sha256: sha256:e01e8db664d2d4f08697f446c287daf21e74c88baca6267ebde92b8752c560c7
+- path: state/tasks/T-0015/handoff.yaml
+  sha256: sha256:3b55996b3eaa3a2a8ceef2f78ee4daee007982b6aeacda65c261263c7807bf5a
+- path: state/tasks/T-0015/evidence_map.yaml
+  sha256: sha256:9f7e74cda983c613fa5feaef8796f99f9283d241186ec520e415bc459891e111
+outputs: []
+exit_code: 1
+logs:
+  stdout: artifacts/tasks/T-0015/runs/RUN-20260221-045338037268/stdout.log
+  stderr: artifacts/tasks/T-0015/runs/RUN-20260221-045338037268/stderr.log

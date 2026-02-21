@@ -1,0 +1,10 @@
+external_roots:
+  - /Volumes/workflow-kb
+ignore_globs:
+  - "**/.git/**"
+  - "**/.venv/**"
+  - "**/__pycache__/**"
+max_repo_file_mb: 20
+chunk_policy:
+  default_max_chars: 1200
+  default_overlap_chars: 200

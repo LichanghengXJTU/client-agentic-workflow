@@ -1,0 +1,2203 @@
+{
+  "dp": [
+    "CHK-0001"
+  ],
+  "notes": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "smith": [
+    "CHK-0001"
+  ],
+  "bertsekas": [
+    "CHK-0001"
+  ],
+  "mdp": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "2026": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "generalization": [
+    "CHK-0001"
+  ],
+  "md": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0005"
+  ],
+  "directory": [
+    "CHK-0001"
+  ],
+  "summary": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "review_queue": [
+    "CHK-0001"
+  ],
+  "evidence": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "title": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "id": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "workflow": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "statement": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "codex": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "examples": [
+    "CHK-0001"
+  ],
+  "done": [
+    "CHK-0001"
+  ],
+  "dd": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "pr_registry": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "todo": [
+    "CHK-0001"
+  ],
+  "status": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "meta": [
+    "CHK-0001"
+  ],
+  "pending": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "created_at": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "kr": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "test_y": [
+    "CHK-0001"
+  ],
+  "key_results": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "python": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "updated_at": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "rework": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "depends_on": [
+    "CHK-0001"
+  ],
+  "tbd": [
+    "CHK-0001"
+  ],
+  "verified": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "rq": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "in_progress": [
+    "CHK-0001"
+  ],
+  "literature": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "waiting_review": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "verification": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "writing": [
+    "CHK-0001"
+  ],
+  "code": [
+    "CHK-0001"
+  ],
+  "cp": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "yaml": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "path": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "tests": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "high": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0005"
+  ],
+  "approve": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "human": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "_check": [
+    "CHK-0001"
+  ],
+  "last_confirmed_commit": [
+    "CHK-0001"
+  ],
+  "test_x": [
+    "CHK-0001"
+  ],
+  "proposed": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "low": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0005"
+  ],
+  "related_tasks": [
+    "CHK-0001"
+  ],
+  "acceptance": [
+    "CHK-0001"
+  ],
+  "experiment": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "owner": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "to": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "results": [
+    "CHK-0001"
+  ],
+  "py": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "pytest": [
+    "CHK-0001"
+  ],
+  "chatgpt": [
+    "CHK-0001"
+  ],
+  "yyyy": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "prs": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "items": [
+    "CHK-0001"
+  ],
+  "guide": [
+    "CHK-0001"
+  ],
+  "p0": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "file": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "checkpoint_tags": [
+    "CHK-0001"
+  ],
+  "task_id": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "t": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "derivation": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "mm": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "12": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "m": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "0000": [
+    "CHK-0001"
+  ],
+  "derivations": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "blocked": [
+    "CHK-0001"
+  ],
+  "type": [
+    "CHK-0001"
+  ],
+  "confidence": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "priority": [
+    "CHK-0001"
+  ],
+  "verify": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "tasks": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "model": [
+    "CHK-0001"
+  ],
+  "first_seen_commit": [
+    "CHK-0001"
+  ],
+  "lemma1_check": [
+    "CHK-0001"
+  ],
+  "p2": [
+    "CHK-0001"
+  ],
+  "reject": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "hash": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "deprecated": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "number": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "p1": [
+    "CHK-0001"
+  ],
+  "data": [
+    "CHK-0001"
+  ],
+  "medium": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0005"
+  ],
+  "0001": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "open": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "head_ref": [
+    "CHK-0002"
+  ],
+  "log": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "command": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "gridworld": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "j": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "python3": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "release": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "release_default_branch": [
+    "CHK-0002"
+  ],
+  "head_sha": [
+    "CHK-0002"
+  ],
+  "github": [
+    "CHK-0002"
+  ],
+  "test": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "monthly_budget_usd": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "log_path": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "job": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "com": [
+    "CHK-0002"
+  ],
+  "base_ref": [
+    "CHK-0002"
+  ],
+  "project_registry": [
+    "CHK-0002"
+  ],
+  "state": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "draft": [
+    "CHK-0002"
+  ],
+  "ai_budget": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "internal": [
+    "CHK-0002"
+  ],
+  "2000": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "url": [
+    "CHK-0002"
+  ],
+  "slug": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "p": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "closed": [
+    "CHK-0002"
+  ],
+  "active": [
+    "CHK-0002",
+    "CHK-0005"
+  ],
+  "pid": [
+    "CHK-0002"
+  ],
+  "public": [
+    "CHK-0002"
+  ],
+  "rl": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "workdir": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "lichanghengxjtu": [
+    "CHK-0002"
+  ],
+  "q": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "0": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "running": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "artifacts": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "jobs": [
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "local_path": [
+    "CHK-0002",
+    "CHK-0005"
+  ],
+  "stopped": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "archived": [
+    "CHK-0002"
+  ],
+  "https": [
+    "CHK-0002"
+  ],
+  "exited": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "learning": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "started_at": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "release_repo": [
+    "CHK-0002"
+  ],
+  "main": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "release_visibility": [
+    "CHK-0002"
+  ],
+  "qlearning": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "12345": [
+    "CHK-0002"
+  ],
+  "agentic": [
+    "CHK-0002"
+  ],
+  "role": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "private": [
+    "CHK-0002"
+  ],
+  "bootstrap": [
+    "CHK-0002"
+  ],
+  "projects": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "merged": [
+    "CHK-0002"
+  ],
+  "source": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "repo": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0005"
+  ],
+  "rejected": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "uncertain": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "external": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0005"
+  ],
+  "tag": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "brief": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "v1": [
+    "CHK-0003"
+  ],
+  "20260221": [
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "entries": [
+    "CHK-0003"
+  ],
+  "goal": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "spec": [
+    "CHK-0003"
+  ],
+  "text": [
+    "CHK-0003"
+  ],
+  "spend_usd": [
+    "CHK-0003"
+  ],
+  "hard_limit_threshold": [
+    "CHK-0003"
+  ],
+  "long_inputs": [
+    "CHK-0003"
+  ],
+  "001": [
+    "CHK-0003"
+  ],
+  "claim_id": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "claims": [
+    "CHK-0003"
+  ],
+  "evidence_map": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "asm": [
+    "CHK-0003"
+  ],
+  "sha256": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "assumptions": [
+    "CHK-0003"
+  ],
+  "alert_threshold": [
+    "CHK-0003"
+  ],
+  "run_id": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "source_sha256": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "1": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "resolved": [
+    "CHK-0003"
+  ],
+  "docs": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "8": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "0015": [
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "note": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "100001": [
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "l54": [
+    "CHK-0003"
+  ],
+  "run": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "scope_in": [
+    "CHK-0003"
+  ],
+  "linked_key_results": [
+    "CHK-0003"
+  ],
+  "in": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "input_id": [
+    "CHK-0003"
+  ],
+  "constraints": [
+    "CHK-0003"
+  ],
+  "inputs": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "current_month": [
+    "CHK-0003"
+  ],
+  "cite": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "scope_out": [
+    "CHK-0003"
+  ],
+  "cl": [
+    "CHK-0003"
+  ],
+  "0009": [
+    "CHK-0003"
+  ],
+  "success_criteria": [
+    "CHK-0003"
+  ],
+  "default_max_chars": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "query": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "02": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "42": [
+    "CHK-0004"
+  ],
+  "7": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "runs": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "absent": [
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "1200": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "volumes": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "task": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "venv": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "critic": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "arm64": [
+    "CHK-0004"
+  ],
+  "stdout": [
+    "CHK-0004"
+  ],
+  "retriever": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "planner": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "3": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "100108": [
+    "CHK-0004"
+  ],
+  "13": [
+    "CHK-0004"
+  ],
+  "__pycache__": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "platform": [
+    "CHK-0004"
+  ],
+  "21t10": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "scribe": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "logs": [
+    "CHK-0004"
+  ],
+  "ignore_globs": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "ended_at": [
+    "CHK-0004"
+  ],
+  "outputs": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "external_roots": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "00": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "present": [
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "seed": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "chunk_policy": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "08": [
+    "CHK-0004"
+  ],
+  "01": [
+    "CHK-0004"
+  ],
+  "key_presence": [
+    "CHK-0004"
+  ],
+  "kb": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "max_repo_file_mb": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "darwin": [
+    "CHK-0004"
+  ],
+  "run_meta": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "environment": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "git": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "kb_config": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "openai_api_key": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "implementer": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "20": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "exit_code": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "stderr": [
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "args": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "schema": [
+    "CHK-0005"
+  ],
+  "collected_at": [
+    "CHK-0005"
+  ],
+  "chunks_path": [
+    "CHK-0005"
+  ],
+  "source_uri": [
+    "CHK-0005"
+  ],
+  "mit": [
+    "CHK-0005"
+  ],
+  "audit": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "schemas": [
+    "CHK-0005"
+  ],
+  "doc_id": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "chunks": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "documents": [
+    "CHK-0005"
+  ],
+  "storage": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "unknown": [
+    "CHK-0005"
+  ],
+  "purpose": [
+    "CHK-0005"
+  ],
+  "7f3ab2": [
+    "CHK-0005"
+  ],
+  "cc": [
+    "CHK-0005"
+  ],
+  "index_refs": [
+    "CHK-0005"
+  ],
+  "doc_summary_path": [
+    "CHK-0005"
+  ],
+  "default_overlap_chars": [
+    "CHK-0005"
+  ],
+  "json": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "size_bytes": [
+    "CHK-0005"
+  ],
+  "foo": [
+    "CHK-0005"
+  ],
+  "200": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "license": [
+    "CHK-0005"
+  ],
+  "doc": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "external_root": [
+    "CHK-0005"
+  ],
+  "enforcement": [
+    "CHK-0005"
+  ],
+  "summaries": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "8e03dc5b": [
+    "CHK-0005"
+  ],
+  "trust_level": [
+    "CHK-0005"
+  ],
+  "version": [
+    "CHK-0005"
+  ],
+  "kb_manifest": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "policy": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0005"
+  ],
+  "jsonl": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "processed": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "inverted": [
+    "CHK-0001",
+    "CHK-0005"
+  ],
+  "index": [
+    "CHK-0001",
+    "CHK-0004",
+    "CHK-0005"
+  ],
+  "18342": [
+    "CHK-0005"
+  ],
+  "background": [
+    "CHK-0005"
+  ],
+  "by": [
+    "CHK-0005"
+  ],
+  "prompt": [
+    "CHK-0001"
+  ],
+  "ai_prompts": [
+    "CHK-0001"
+  ],
+  "files": [
+    "CHK-0001"
+  ],
+  "plan": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "reflector": [
+    "CHK-0001"
+  ],
+  "prompts": [
+    "CHK-0001"
+  ],
+  "auditor": [
+    "CHK-0001"
+  ],
+  "80": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "100": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "ai": [
+    "CHK-0001",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "last_seen_at": [
+    "CHK-0001"
+  ],
+  "size": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "mtime": [
+    "CHK-0001"
+  ],
+  "pointer": [
+    "CHK-0001"
+  ],
+  "char_start": [
+    "CHK-0001"
+  ],
+  "lx": [
+    "CHK-0001"
+  ],
+  "line_end": [
+    "CHK-0001"
+  ],
+  "char_end": [
+    "CHK-0001"
+  ],
+  "paths": [
+    "CHK-0001"
+  ],
+  "text_sha256": [
+    "CHK-0001"
+  ],
+  "line_start": [
+    "CHK-0001"
+  ],
+  "snippet": [
+    "CHK-0001"
+  ],
+  "score": [
+    "CHK-0001"
+  ],
+  "5": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "overlap_chars": [
+    "CHK-0001"
+  ],
+  "knowledge_base": [
+    "CHK-0001"
+  ],
+  "ingest": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "chunk_meta": [
+    "CHK-0001"
+  ],
+  "corpus": [
+    "CHK-0001"
+  ],
+  "safety": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "core": [
+    "CHK-0001"
+  ],
+  "gitignore": [
+    "CHK-0001"
+  ],
+  "line": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "2": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "max_chars": [
+    "CHK-0001"
+  ],
+  "4": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "6": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "chunk_id": [
+    "CHK-0001"
+  ],
+  "xxxx": [
+    "CHK-0001"
+  ],
+  "integrity": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "heading": [
+    "CHK-0001"
+  ],
+  "chunk": [
+    "CHK-0001"
+  ],
+  "scope": [
+    "CHK-0001"
+  ],
+  "l": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "src": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "citation": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "local": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "ai_secrets": [
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "s": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "decaying": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "style": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "the": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "convergence": [
+    "CHK-0001"
+  ],
+  "under": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "see": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "equation": [
+    "CHK-0001"
+  ],
+  "is": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "small": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "practice": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "finite": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "operator": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "project": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "relation": [
+    "CHK-0001"
+  ],
+  "transition": [
+    "CHK-0001"
+  ],
+  "mathcal": [
+    "CHK-0001"
+  ],
+  "r": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "updates": [
+    "CHK-0001"
+  ],
+  "mathbb": [
+    "CHK-0001"
+  ],
+  "bounded": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "converges": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "sample": [
+    "CHK-0001"
+  ],
+  "deterministic": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "right": [
+    "CHK-0001"
+  ],
+  "max_": [
+    "CHK-0001"
+  ],
+  "we": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "bellman": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "uses": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "q_": [
+    "CHK-0001"
+  ],
+  "q_learning_bellman_check": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "empirical": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "exploration": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "s_t": [
+    "CHK-0001"
+  ],
+  "rewards": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "sampled": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "point": [
+    "CHK-0001"
+  ],
+  "epsilon": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "this": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "s_": [
+    "CHK-0001"
+  ],
+  "script": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "two": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "conditions": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "target": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "update": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "monro": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "fixed": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "rule": [
+    "CHK-0001"
+  ],
+  "a_t": [
+    "CHK-0001"
+  ],
+  "optimality": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "improvement": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "bracketed": [
+    "CHK-0001"
+  ],
+  "gamma": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "step": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "r_t": [
+    "CHK-0001"
+  ],
+  "for": [
+    "CHK-0001"
+  ],
+  "e": [
+    "CHK-0001"
+  ],
+  "left": [
+    "CHK-0001"
+  ],
+  "why": [
+    "CHK-0001"
+  ],
+  "reproducible": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "on": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "and": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "sufficient": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "term": [
+    "CHK-0001"
+  ],
+  "of": [
+    "CHK-0001"
+  ],
+  "robbins": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "properties": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "tabular": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "a": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "alpha_t": [
+    "CHK-0001"
+  ],
+  "with": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "greedy": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "stochastic": [
+    "CHK-0001"
+  ],
+  "quality": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "here": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "checks": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "q_t": [
+    "CHK-0001"
+  ],
+  "backup": [
+    "CHK-0001"
+  ],
+  "expected": [
+    "CHK-0001"
+  ],
+  "approximation": [
+    "CHK-0001"
+  ],
+  "_": [
+    "CHK-0001"
+  ],
+  "runnable": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "define": [
+    "CHK-0001"
+  ],
+  "use": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "one": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "exactly": [
+    "CHK-0002"
+  ],
+  "alpha": [
+    "CHK-0002"
+  ],
+  "sup": [
+    "CHK-0002"
+  ],
+  "norm": [
+    "CHK-0002"
+  ],
+  "matches": [
+    "CHK-0002"
+  ],
+  "contraction": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "cascade": [
+    "CHK-0001"
+  ],
+  "gate": [
+    "CHK-0001"
+  ],
+  "governance": [
+    "CHK-0001"
+  ],
+  "pr": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "force": [
+    "CHK-0001"
+  ],
+  "human_review_log": [
+    "CHK-0001"
+  ],
+  "head": [
+    "CHK-0001"
+  ],
+  "commit": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "superseded": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "revert": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "anchor": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "rollback": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "restart": [
+    "CHK-0001"
+  ],
+  "timestamp": [
+    "CHK-0001"
+  ],
+  "push": [
+    "CHK-0001"
+  ],
+  "queue": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "install": [
+    "CHK-0001"
+  ],
+  "playbook": [
+    "CHK-0001"
+  ],
+  "demo": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "review": [
+    "CHK-0001",
+    "CHK-0004"
+  ],
+  "20260220": [
+    "CHK-0001",
+    "CHK-0003"
+  ],
+  "daily": [
+    "CHK-0001"
+  ],
+  "list": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "sync": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "bash": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "pip": [
+    "CHK-0001"
+  ],
+  "add": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "reviewer": [
+    "CHK-0001"
+  ],
+  "registry": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "scaffold": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "txt": [
+    "CHK-0001"
+  ],
+  "requirements": [
+    "CHK-0001"
+  ],
+  "default": [
+    "CHK-0002"
+  ],
+  "body": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "from": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "automation": [
+    "CHK-0002"
+  ],
+  "branch": [
+    "CHK-0002"
+  ],
+  "publish": [
+    "CHK-0002",
+    "CHK-0003"
+  ],
+  "visibility": [
+    "CHK-0002"
+  ],
+  "or": [
+    "CHK-0003"
+  ],
+  "ai_config": [
+    "CHK-0003"
+  ],
+  "cmd": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "close": [
+    "CHK-0003"
+  ],
+  "gh": [
+    "CHK-0003"
+  ],
+  "i_understand_hard_reset": [
+    "CHK-0003"
+  ],
+  "phase": [
+    "CHK-0003"
+  ],
+  "checkpoint": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "key": [
+    "CHK-0003"
+  ],
+  "feat": [
+    "CHK-0003"
+  ],
+  "cli": [
+    "CHK-0003"
+  ],
+  "stable": [
+    "CHK-0003"
+  ],
+  "x": [
+    "CHK-0003"
+  ],
+  "mode": [
+    "CHK-0003"
+  ],
+  "result": [
+    "CHK-0003"
+  ],
+  "phrase": [
+    "CHK-0003"
+  ],
+  "safe": [
+    "CHK-0003"
+  ],
+  "hard": [
+    "CHK-0003"
+  ],
+  "confirm": [
+    "CHK-0003"
+  ],
+  "xxx": [
+    "CHK-0003"
+  ],
+  "checkpoints": [
+    "CHK-0003",
+    "CHK-0004"
+  ],
+  "ref": [
+    "CHK-0003"
+  ],
+  "overview": [
+    "CHK-0004"
+  ],
+  "k": [
+    "CHK-0004"
+  ],
+  "powershell": [
+    "CHK-0004"
+  ],
+  "windows": [
+    "CHK-0004"
+  ],
+  "linux": [
+    "CHK-0004"
+  ],
+  "top": [
+    "CHK-0004"
+  ],
+  "app": [
+    "CHK-0004"
+  ],
+  "tabs": [
+    "CHK-0004"
+  ],
+  "10": [
+    "CHK-0004"
+  ],
+  "dashboard": [
+    "CHK-0004"
+  ],
+  "9": [
+    "CHK-0001",
+    "CHK-0002",
+    "CHK-0004"
+  ],
+  "macos": [
+    "CHK-0004"
+  ],
+  "streamlit": [
+    "CHK-0004"
+  ],
+  "stop": [
+    "CHK-0004"
+  ],
+  "11": [
+    "CHK-0004"
+  ],
+  "axis": [
+    "CHK-0001"
+  ],
+  "int": [
+    "CHK-0001"
+  ],
+  "lhs": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "import": [
+    "CHK-0001"
+  ],
+  "contraction_check": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "t2": [
+    "CHK-0001"
+  ],
+  "row": [
+    "CHK-0001"
+  ],
+  "violated": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "einsum": [
+    "CHK-0001"
+  ],
+  "num_states": [
+    "CHK-0001"
+  ],
+  "normal": [
+    "CHK-0001"
+  ],
+  "return": [
+    "CHK-0001"
+  ],
+  "q2": [
+    "CHK-0001"
+  ],
+  "t1": [
+    "CHK-0001"
+  ],
+  "__future__": [
+    "CHK-0001"
+  ],
+  "max": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "ndarray": [
+    "CHK-0001"
+  ],
+  "array": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "default_rng": [
+    "CHK-0001"
+  ],
+  "rng": [
+    "CHK-0001"
+  ],
+  "num_actions": [
+    "CHK-0001"
+  ],
+  "float": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "v": [
+    "CHK-0001"
+  ],
+  "sas": [
+    "CHK-0001"
+  ],
+  "sa": [
+    "CHK-0001"
+  ],
+  "annotations": [
+    "CHK-0001"
+  ],
+  "as": [
+    "CHK-0001"
+  ],
+  "abs": [
+    "CHK-0001"
+  ],
+  "bellman_optimality_operator": [
+    "CHK-0001"
+  ],
+  "95": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "shape": [
+    "CHK-0001"
+  ],
+  "random": [
+    "CHK-0001"
+  ],
+  "sum": [
+    "CHK-0001"
+  ],
+  "f": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "keepdims": [
+    "CHK-0001"
+  ],
+  "none": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "q1": [
+    "CHK-0001"
+  ],
+  "rhs": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "sampled_update_matches_target": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "numpy": [
+    "CHK-0001"
+  ],
+  "tensor": [
+    "CHK-0001"
+  ],
+  "assert": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "uniform": [
+    "CHK-0001"
+  ],
+  "true": [
+    "CHK-0001"
+  ],
+  "np": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "def": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "1e": [
+    "CHK-0001"
+  ],
+  "isclose": [
+    "CHK-0002"
+  ],
+  "copy": [
+    "CHK-0002"
+  ],
+  "print": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "dtype": [
+    "CHK-0002"
+  ],
+  "s_next": [
+    "CHK-0002"
+  ],
+  "__name__": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "__main__": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "equal": [
+    "CHK-0002"
+  ],
+  "updated": [
+    "CHK-0002"
+  ],
+  "passed": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "must": [
+    "CHK-0002"
+  ],
+  "if": [
+    "CHK-0001",
+    "CHK-0002"
+  ],
+  "symbols": [
+    "CHK-0001"
+  ],
+  "lemma1": [
+    "CHK-0001"
+  ],
+  "failed": [
+    "CHK-0001"
+  ],
+  "raise": [
+    "CHK-0001"
+  ],
+  "sympy": [
+    "CHK-0001"
+  ],
+  "expand": [
+    "CHK-0001"
+  ],
+  "systemexit": [
+    "CHK-0001"
+  ],
+  "b": [
+    "CHK-0001"
+  ],
+  "simplify": [
+    "CHK-0001"
+  ],
+  "lemma": [
+    "CHK-0001"
+  ],
+  "square": [
+    "CHK-0001"
+  ],
+  "ba": [
+    "CHK-0001"
+  ],
+  "2ab": [
+    "CHK-0001"
+  ],
+  "test_lemma1": [
+    "CHK-0001"
+  ],
+  "binomial": [
+    "CHK-0001"
+  ],
+  "identity": [
+    "CHK-0001"
+  ],
+  "asset": [
+    "CHK-0001"
+  ],
+  "ab": [
+    "CHK-0001"
+  ],
+  "accepted_at": [
+    "CHK-0001"
+  ],
+  "check": [
+    "CHK-0001"
+  ],
+  "worklog": [
+    "CHK-0001"
+  ],
+  "act": [
+    "CHK-0001"
+  ],
+  "rules": [
+    "CHK-0001"
+  ],
+  "metadata": [
+    "CHK-0001"
+  ],
+  "handoff": [
+    "CHK-0001"
+  ],
+  "claim": [
+    "CHK-0001"
+  ],
+  "accepted": [
+    "CHK-0001"
+  ],
+  "required": [
+    "CHK-0001"
+  ],
+  "do": [
+    "CHK-0001"
+  ],
+  "run_index": [
+    "CHK-0001"
+  ],
+  "guardrails": [
+    "CHK-0001"
+  ],
+  "pdca": [
+    "CHK-0001"
+  ],
+  "markdown": [
+    "CHK-0001"
+  ],
+  "theorem": [
+    "CHK-0001"
+  ]
+}

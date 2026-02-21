@@ -1,0 +1,1 @@
+{"chunk_id": "CHK-0001", "summary": "from __future__ import annotations  from sympy import expand, simplify, symbols   def main() -> None:     a, b = symbols(\"a b\")     lhs = expand((a + b) ** 2)     rhs = a**2 + 2 * "}
