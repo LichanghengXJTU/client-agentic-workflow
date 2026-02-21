@@ -129,6 +129,71 @@ def _verify_citations(root: Path) -> VerifyStep:
     )
 
 
+def _verify_intake_subtasks(root: Path) -> VerifyStep:
+    task_root = root / "state" / "tasks"
+    if not task_root.exists():
+        return VerifyStep(
+            name="verify_intake_subtasks",
+            command=["verify_intake_subtasks"],
+            returncode=0,
+            stdout="No state/tasks/ directory; skipped intake/subtask checks.",
+            stderr="",
+        )
+
+    issues: list[str] = []
+    for task_dir in sorted(path for path in task_root.iterdir() if path.is_dir()):
+        task_id = task_dir.name
+        intake_path = task_dir / "intake.yaml"
+        subtasks_path = task_dir / "subtasks.yaml"
+
+        if intake_path.exists():
+            intake = read_yaml(intake_path)
+            if str(intake.get("task_id", "")) != task_id:
+                issues.append(f"{intake_path.as_posix()}: task_id mismatch.")
+            if not isinstance(intake.get("sections"), dict):
+                issues.append(f"{intake_path.as_posix()}: sections must be mapping.")
+            if not isinstance(intake.get("completeness"), dict):
+                issues.append(f"{intake_path.as_posix()}: completeness must be mapping.")
+            raw_ref = str(intake.get("raw_prompt_ref", "")).strip()
+            if raw_ref and not (root / raw_ref).exists():
+                issues.append(f"{intake_path.as_posix()}: raw_prompt_ref missing file `{raw_ref}`.")
+
+        if subtasks_path.exists():
+            subtasks = read_yaml(subtasks_path).get("subtasks", [])
+            if not isinstance(subtasks, list):
+                issues.append(f"{subtasks_path.as_posix()}: subtasks must be list.")
+                continue
+            for idx, sub in enumerate(subtasks):
+                if not isinstance(sub, dict):
+                    issues.append(f"{subtasks_path.as_posix()}: subtasks[{idx}] must be mapping.")
+                    continue
+                sid = str(sub.get("id", "")).strip()
+                if not sid:
+                    issues.append(f"{subtasks_path.as_posix()}: subtasks[{idx}] missing id.")
+                owner = str(sub.get("owner", ""))
+                if owner not in {"planner", "retriever", "implementer", "critic", "scribe", "human"}:
+                    issues.append(f"{subtasks_path.as_posix()}: subtasks[{idx}] owner invalid.")
+                status = str(sub.get("status", ""))
+                if status not in {"todo", "in_progress", "waiting_review", "done", "blocked"}:
+                    issues.append(f"{subtasks_path.as_posix()}: subtasks[{idx}] status invalid.")
+
+    if issues:
+        return VerifyStep(
+            name="verify_intake_subtasks",
+            command=["verify_intake_subtasks"],
+            returncode=1,
+            stdout="",
+            stderr="\n".join(issues),
+        )
+    return VerifyStep(
+        name="verify_intake_subtasks",
+        command=["verify_intake_subtasks"],
+        returncode=0,
+        stdout="Intake/subtask checks passed (or not present yet for lazy migration).",
+        stderr="",
+    )
+
+
 def _verify_kb_query_smoke(root: Path) -> VerifyStep:
     inverted = root / KB_INDEX_DIR / "inverted.json"
     chunk_meta = root / KB_INDEX_DIR / "chunk_meta.jsonl"
@@ -227,6 +292,7 @@ def run_verify(cwd: str | Path | None = None) -> VerifyResult:
 
     steps.append(_verify_task_records(root))
     steps.append(_verify_citations(root))
+    steps.append(_verify_intake_subtasks(root))
     steps.append(_verify_kb_query_smoke(root))
     steps.append(_verify_replay(root))
 

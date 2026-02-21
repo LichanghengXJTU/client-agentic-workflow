@@ -317,3 +317,33 @@ tasks:
   - T-0015
   created_at: '2026-02-22'
   updated_at: '2026-02-22'
+- id: T-0017
+  title: 实现 Dashboard 双中心（Intake/Execution）与子任务审批级联
+  type: code
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - Dashboard 提供 Intake Center/Execution Center，并与旧治理能力兼容
+  - 新增 intake/subtasks/prompt-contracts 数据契约与懒迁移能力
+  - 支持子任务级 Approve/Rework/Reject，Reject 强制 anchor 且安全级联
+  - 支持任务动态流、PR 聚合与图片输出展示
+  - pytest + workflow verify + workflow audit 全通过
+  evidence:
+  - dashboard/app.py
+  - dashboard/components.py
+  - workflow/intake_ops.py
+  - workflow/subtask_ops.py
+  - workflow/activity_ops.py
+  - workflow/review_ops.py
+  - workflow/verify.py
+  - workflow/audit.py
+  - state/PROMPT_CONTRACTS.yaml
+  verification:
+  - .venv/bin/python -m pytest -q
+  - .venv/bin/python -m workflow verify
+  - .venv/bin/python -m workflow audit
+  depends_on:
+  - T-0016
+  created_at: '2026-02-22'
+  updated_at: '2026-02-22'

@@ -7,10 +7,10 @@ claims:
   confidence: high
   evidence:
   - cite: docs/WORKFLOW.md#L51
-    source_sha256: sha256:b3f718cd13bc11337a91c4eef008d50221c41d11786e5323b1ec4b2d9f6b18aa
+    source_sha256: sha256:5ce7f0697fb52fee3c42c866d1a69e7122848b37545e86287852a111c577d35d
     note: WORKFLOW 文档已包含 verify/audit 与 task/kb 命令落点
   - cite: docs/TASK_WORKFLOW.md#L1
-    source_sha256: sha256:bfb62f8a9caf9c5c898c8bb1a4c0e7ce63ca469680ce2423556b3eb94b406cd1
+    source_sha256: sha256:e8d24b43894f300f3f4d61429b59d3dca367a27262209b98fffcfb088c653fd2
     note: 任务级模板与交接规则
   verification:
   - command: .venv/bin/python -m workflow kb query --task T-0015 --q 'workflow verify'

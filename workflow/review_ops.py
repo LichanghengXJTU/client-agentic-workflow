@@ -10,6 +10,7 @@ from .state_ops import (
     append_human_review_log,
     append_state_event,
     load_key_results,
+    review_item_by_id,
     load_tasks,
     save_key_results,
     save_tasks,
@@ -85,8 +86,31 @@ def apply_review_action(
     action: str,
     notes: str,
     anchor: str | None = None,
+    cascade_scope: str | None = None,
     cwd: str | Path | None = None,
 ) -> ReviewActionResult:
+    review_snapshot = review_item_by_id(review_id)
+    if str(review_snapshot.get("scope", "task")) == "subtask":
+        from .subtask_ops import apply_subtask_review_action
+
+        subtask_result = apply_subtask_review_action(
+            review_id=review_id,
+            reviewer=reviewer,
+            action=action,
+            notes=notes,
+            anchor=anchor,
+            cascade_scope=cascade_scope,
+            cwd=cwd,
+        )
+        return ReviewActionResult(
+            action=action,
+            review=subtask_result.review,
+            task=subtask_result.task,
+            rollback_branch=subtask_result.rollback_branch,
+            reverted_count=subtask_result.reverted_count,
+            closed_prs=subtask_result.closed_prs,
+        )
+
     action_norm = action.lower()
     review_item = set_review_item_status(review_id, action_norm)
     task_id = review_item["task_id"]

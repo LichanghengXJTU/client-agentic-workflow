@@ -123,19 +123,32 @@ streamlit run dashboard/app.py
 ```
 Tabs:
 - Overview
-- Tasks
+- Intake Center
+- Execution Center
 - Review Queue
 - Checkpoints
 - Audit & Verify
 - Jobs & AI
 
+Intake Center:
+- 输入长文本 prompt + 仓库文件路径 + 可选上传附件
+- 自动拆解为结构化 sections，并给 completeness + clarifications
+- 一次性创建 `TASKS.yaml` 任务 + `state/tasks/<task_id>/intake.yaml` + `subtasks.yaml`
+
+Execution Center:
+- 左侧任务摘要列表，右侧任务/子任务 hero
+- 子任务动态流：AI 输出、run_meta、verify/audit 摘要、审批事件
+- 子任务审批：Approve/Rework/Reject（Reject 必须 anchor，触发 rollback cascade）
+- 聚合相关 PR 摘要与图片产物画廊
+
 ## 10. 推荐的每日循环（简单版）
 1. `workflow sync` + `workflow status`
-2. 在 Tasks 中推进任务，完成后改为 `waiting_review`
-3. 审批（approve/rework/reject）
-4. 跑 `verify` + `audit`
-5. 创建 checkpoint
-6. 需要发布时 `pr open`
+2. 在 Intake Center 录入复杂输入并创建任务
+3. 在 Execution Center 推进子任务并同步 review queue
+4. 审批（approve/rework/reject，subtask 可选 cascade scope）
+5. 跑 `verify` + `audit`
+6. 创建 checkpoint
+7. 需要发布时 `pr open`
 
 ## 11. 跨平台说明（macOS/Linux/Windows）
 - macOS/Linux: 直接使用本文命令。

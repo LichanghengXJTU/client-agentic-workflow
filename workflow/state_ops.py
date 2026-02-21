@@ -20,6 +20,70 @@ AI_BUDGET_PATH = STATE_DIR / "AI_BUDGET.yaml"
 PROJECT_REGISTRY_PATH = STATE_DIR / "PROJECT_REGISTRY.yaml"
 KB_CONFIG_PATH = STATE_DIR / "KB_CONFIG.yaml"
 KB_MANIFEST_PATH = STATE_DIR / "KB_MANIFEST.yaml"
+PROMPT_CONTRACTS_PATH = STATE_DIR / "PROMPT_CONTRACTS.yaml"
+TASK_STATE_ROOT = STATE_DIR / "tasks"
+
+
+def default_prompt_contracts() -> dict[str, Any]:
+    return {
+        "version": 1,
+        "default_contract": {
+            "required_sections": [
+                "core_task",
+                "required_files",
+                "workflow",
+                "response_style",
+                "acceptance",
+                "constraints",
+                "deliverables",
+            ],
+            "sections": {
+                "core_task": {
+                    "label": "核心任务",
+                    "aliases": ["core task", "核心任务", "任务目标", "goal"],
+                    "kind": "text",
+                },
+                "required_files": {
+                    "label": "需要提供的文件",
+                    "aliases": ["required files", "files", "文件", "材料"],
+                    "kind": "list",
+                },
+                "workflow": {
+                    "label": "工作流程",
+                    "aliases": ["workflow", "流程", "步骤"],
+                    "kind": "list",
+                },
+                "response_style": {
+                    "label": "回答方式",
+                    "aliases": ["response style", "回答方式", "输出风格"],
+                    "kind": "text",
+                },
+                "acceptance": {
+                    "label": "验收标准",
+                    "aliases": ["acceptance", "验收", "成功标准"],
+                    "kind": "list",
+                },
+                "constraints": {
+                    "label": "约束",
+                    "aliases": ["constraints", "约束", "限制"],
+                    "kind": "list",
+                },
+                "deliverables": {
+                    "label": "产出",
+                    "aliases": ["deliverables", "产出", "输出物"],
+                    "kind": "list",
+                },
+                "visualization": {
+                    "label": "可视化需求",
+                    "aliases": ["visualization", "可视化", "图片"],
+                    "kind": "enum",
+                    "choices": ["auto", "required", "none"],
+                },
+            },
+        },
+        "task_type_overrides": {},
+        "project_overrides": {},
+    }
 
 
 def now_iso() -> str:
@@ -119,6 +183,61 @@ def task_by_id(task_id: str, path: str | Path = TASKS_PATH) -> dict[str, Any]:
     raise KeyError(f"Task not found: {task_id}")
 
 
+def task_state_dir(task_id: str, root: str | Path = TASK_STATE_ROOT) -> Path:
+    return Path(root) / task_id
+
+
+def load_task_intake(task_id: str, root: str | Path = TASK_STATE_ROOT) -> dict[str, Any]:
+    path = task_state_dir(task_id, root=root) / "intake.yaml"
+    return read_yaml(path)
+
+
+def save_task_intake_data(task_id: str, data: dict[str, Any], root: str | Path = TASK_STATE_ROOT) -> None:
+    path = task_state_dir(task_id, root=root) / "intake.yaml"
+    atomic_write_yaml(path, data)
+
+
+def load_task_subtasks(task_id: str, root: str | Path = TASK_STATE_ROOT) -> dict[str, Any]:
+    path = task_state_dir(task_id, root=root) / "subtasks.yaml"
+    data = read_yaml(path)
+    if not data:
+        return {"task_id": task_id, "subtasks": []}
+    data.setdefault("task_id", task_id)
+    data.setdefault("subtasks", [])
+    return data
+
+
+def save_task_subtasks(task_id: str, data: dict[str, Any], root: str | Path = TASK_STATE_ROOT) -> None:
+    payload = dict(data)
+    payload["task_id"] = task_id
+    payload.setdefault("subtasks", [])
+    path = task_state_dir(task_id, root=root) / "subtasks.yaml"
+    atomic_write_yaml(path, payload)
+
+
+def load_prompt_contracts(path: str | Path = PROMPT_CONTRACTS_PATH) -> dict[str, Any]:
+    data = read_yaml(path)
+    if not data:
+        return default_prompt_contracts()
+    merged = default_prompt_contracts()
+    merged.update({k: v for k, v in data.items() if k != "default_contract"})
+    if isinstance(data.get("default_contract"), dict):
+        merged_default = dict(merged["default_contract"])
+        for key, value in data["default_contract"].items():
+            if key == "sections" and isinstance(value, dict):
+                section_map = dict(merged_default.get("sections", {}))
+                section_map.update(value)
+                merged_default["sections"] = section_map
+            else:
+                merged_default[key] = value
+        merged["default_contract"] = merged_default
+    return merged
+
+
+def save_prompt_contracts(data: dict[str, Any], path: str | Path = PROMPT_CONTRACTS_PATH) -> None:
+    atomic_write_yaml(path, data)
+
+
 def load_review_queue(path: str | Path = REVIEW_QUEUE_PATH) -> list[dict[str, Any]]:
     data = read_yaml(path)
     return data.get("items", [])
@@ -136,8 +255,10 @@ def sync_review_queue_from_tasks(
     queue = load_review_queue(queue_path)
     now = today_str()
 
-    existing_by_task = {item.get("task_id"): item for item in queue}
-    merged: list[dict[str, Any]] = []
+    subtask_scope_items = [item for item in queue if str(item.get("scope", "task")) == "subtask"]
+    task_scope_items = [item for item in queue if str(item.get("scope", "task")) != "subtask"]
+    existing_by_task = {item.get("task_id"): item for item in task_scope_items}
+    merged_tasks: list[dict[str, Any]] = []
 
     for task in tasks:
         if task.get("status") != "waiting_review":
@@ -145,21 +266,24 @@ def sync_review_queue_from_tasks(
         old = existing_by_task.get(task["id"])
         if old:
             old["title"] = task["title"]
+            old["scope"] = "task"
             old["updated_at"] = now
-            merged.append(old)
+            merged_tasks.append(old)
             continue
-        rq_id = _next_prefixed_id([it.get("id", "") for it in queue + merged], "RQ")
-        merged.append(
+        rq_id = _next_prefixed_id([it.get("id", "") for it in queue + merged_tasks], "RQ")
+        merged_tasks.append(
             {
                 "id": rq_id,
                 "task_id": task["id"],
                 "title": task["title"],
+                "scope": "task",
                 "status": "pending",
                 "created_at": now,
                 "updated_at": now,
             }
         )
 
+    merged = subtask_scope_items + merged_tasks
     save_review_queue(merged, queue_path)
     return merged
 
@@ -176,6 +300,29 @@ def set_review_item_status(
             item["updated_at"] = today_str()
             save_review_queue(items, queue_path)
             return item
+    raise KeyError(f"Review item not found: {review_id}")
+
+
+def review_item_by_id(review_id: str, queue_path: str | Path = REVIEW_QUEUE_PATH) -> dict[str, Any]:
+    for item in load_review_queue(queue_path):
+        if item.get("id") == review_id:
+            return item
+    raise KeyError(f"Review item not found: {review_id}")
+
+
+def update_review_item(
+    review_id: str,
+    updates: dict[str, Any],
+    queue_path: str | Path = REVIEW_QUEUE_PATH,
+) -> dict[str, Any]:
+    items = load_review_queue(queue_path)
+    for item in items:
+        if item.get("id") != review_id:
+            continue
+        item.update(updates)
+        item["updated_at"] = today_str()
+        save_review_queue(items, queue_path)
+        return item
     raise KeyError(f"Review item not found: {review_id}")
 
 
@@ -243,6 +390,7 @@ def ensure_minimum_state_files() -> None:
         (PR_REGISTRY_PATH, {"prs": []}),
         (PROJECT_REGISTRY_PATH, {"projects": []}),
         (KB_MANIFEST_PATH, {"documents": []}),
+        (PROMPT_CONTRACTS_PATH, default_prompt_contracts()),
         (JOBS_PATH, {"jobs": []}),
         (
             AI_BUDGET_PATH,
@@ -259,6 +407,8 @@ def ensure_minimum_state_files() -> None:
     for path, content in defaults:
         if not path.exists():
             atomic_write_yaml(path, content)
+
+    TASK_STATE_ROOT.mkdir(parents=True, exist_ok=True)
 
     if not HUMAN_REVIEW_LOG_PATH.exists():
         append_human_review_log("system", "bootstrap", "init", "Initialize human review log")

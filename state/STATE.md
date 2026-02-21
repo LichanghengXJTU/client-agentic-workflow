@@ -312,3 +312,34 @@
   - `.venv/bin/python -m workflow ai task --id T-0015 --response-profile paper_en --project rl-gridworld-qlearning --prompt-budget high --viz auto` -> OK (`artifacts/tasks/T-0015/ai/ai-20260222-002411.md`)
 - Citation integrity follow-up:
   - updated `state/tasks/T-0015/evidence_map.yaml` sha for `docs/WORKFLOW.md` to clear verify/audit P0.
+
+## Dashboard Dual-Center Upgrade (2026-02-22)
+- Implemented dual-center dashboard architecture:
+  - `Intake Center`: long prompt intake, structured parse, completeness scoring, clarification suggestions, one-click task creation.
+  - `Execution Center`: task/subtask hero, activity stream, subtask review panel, PR summaries, and image gallery.
+- Added new workflow modules:
+  - `workflow/intake_ops.py`: intake parsing/scoring/persistence (+ optional AI clarification suggestions).
+  - `workflow/subtask_ops.py`: lazy subtask/intake migration, subtask review queue sync, cascade suggestion, subtask review actions.
+  - `workflow/activity_ops.py`: activity timeline, image extraction, and task-related PR matching.
+- Extended governance-compatible review flow:
+  - `workflow/review_ops.py` now supports `scope=subtask` review delegation.
+  - `state/REVIEW_QUEUE.yaml` supports optional `scope/subtask_id/cascade_scope/cascade_advice_ref`.
+- Added new state contract:
+  - `state/PROMPT_CONTRACTS.yaml`.
+- Updated verification/audit guardrails:
+  - `workflow/verify.py` adds `verify_intake_subtasks`.
+  - `workflow/audit.py` adds intake/subtask schema checks and review queue scope consistency checks.
+- Added tests:
+  - `tests/test_intake_ops.py`
+  - `tests/test_subtask_ops.py`
+  - `tests/test_subtask_review_flow.py`
+  - `tests/test_activity_ops.py`
+  - updated `tests/test_review_queue_flow.py`, `tests/test_dashboard_smoke.py`
+- Validation:
+  - `.venv/bin/python -m pytest -q` -> 64 passed.
+  - `.venv/bin/python -m workflow verify` -> PASS (`artifacts/test/verify-20260222-0252.md`).
+  - `.venv/bin/python -m workflow audit` -> P0=0/P1=0/P2=0 (`artifacts/audit/20260222-0252.md`).
+- Citation integrity follow-up:
+  - refreshed `state/tasks/T-0015/evidence_map.yaml` sha for `docs/WORKFLOW.md` and `docs/TASK_WORKFLOW.md` after doc updates.
+- KEY_RESULTS decision:
+  - no new critical scientific/algorithmic conclusion added; `state/KEY_RESULTS.yaml` unchanged in this round.

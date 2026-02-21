@@ -205,19 +205,24 @@ python -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
 - `PROJECT_REGISTRY.yaml`：多项目注册信息。
 - `PR_REGISTRY.yaml`：PR 跟踪（source/release）。
 - `KB_CONFIG.yaml` / `KB_MANIFEST.yaml`：KB 配置与文档清单。
+- `PROMPT_CONTRACTS.yaml`：Intake 输入模板与必填项契约。
 - `STATE.md`：可读状态快照与历史上下文。
 - `HUMAN_REVIEW_LOG.md`：人类审批留痕。
 
 ### 5.3 `dashboard/` 操作面板
-`streamlit run dashboard/app.py` 提供六个 tab：
+`streamlit run dashboard/app.py` 提供七个 tab：
 - Overview
-- Tasks
+- Intake Center
+- Execution Center
 - Review Queue
 - Checkpoints
 - Audit & Verify
 - Jobs & AI
 
-并对关键 git 写操作提供确认 guard，降低误操作风险。
+其中：
+- Intake Center 用于长文本输入拆解（文件/目标/流程/回答方式）并一次性创建任务+子任务。
+- Execution Center 用于任务输出聚合（动态流、模型反馈、子任务审批、PR 摘要、图片结果）。
+- 关键 git 写操作仍有确认 guard，降低误操作风险。
 
 ### 5.4 `tests/` 回归防线
 当前测试覆盖重点包括：

@@ -39,6 +39,10 @@ items:
     task_id: "T-0001"
     title: "..."
     status: "pending|approve|rework|reject"
+    scope: "task|subtask"  # optional, default task
+    subtask_id: "ST-001"   # required when scope=subtask
+    cascade_scope: "self_only|downstream|all"
+    cascade_advice_ref: "artifacts/tasks/T-0017/ai/cascade-advice-....yaml"
     created_at: "YYYY-MM-DD"
     updated_at: "YYYY-MM-DD"
 ```
@@ -181,6 +185,77 @@ assumptions:
     text: "..."
     status: "open|resolved"
     tag: "uncertain"
+```
+
+## state/tasks/<task_id>/intake.yaml
+```yaml
+task_id: "T-0017"
+project_slug: "rl-gridworld-qlearning"
+raw_prompt_ref: "artifacts/tasks/T-0017/inputs/intake-20260222-120001.md"
+sections:
+  core_task: "..."
+  required_files: ["workflow/ai.py", "docs/WORKFLOW.md"]
+  workflow: ["Plan", "Do", "Check", "Act"]
+  response_style: "qa_zh"
+  acceptance: ["..."]
+  constraints: ["..."]
+  deliverables: ["..."]
+  visualization: "auto|required|none"
+completeness:
+  missing_required: []
+  score: 0.0
+attachments:
+  - path: "artifacts/tasks/T-0017/inputs/uploads/.../spec.pdf"
+    sha256: "sha256:..."
+```
+
+## state/tasks/<task_id>/subtasks.yaml
+```yaml
+task_id: "T-0017"
+subtasks:
+  - id: "ST-001"
+    title: "..."
+    objective: "..."
+    owner: "planner|retriever|implementer|critic|scribe|human"
+    priority: "P0|P1|P2"
+    status: "todo|in_progress|waiting_review|done|blocked"
+    depends_on: ["ST-000"]
+    prompt_contract:
+      core_task: "..."
+      required_files: []
+      workflow: []
+      response_style: "qa_zh"
+      deliverables: []
+      verification: []
+    latest_summary: "..."
+    latest_event_at: "2026-02-22T12:00:00"
+    review_history:
+      - time: "2026-02-22T12:00:00"
+        reviewer: "human"
+        action: "Rework|Reject|Approve"
+        notes: "..."
+        scope: "self_only|downstream|all"
+```
+
+## PROMPT_CONTRACTS.yaml
+```yaml
+version: 1
+default_contract:
+  required_sections:
+    - core_task
+    - required_files
+    - workflow
+    - response_style
+    - acceptance
+    - constraints
+    - deliverables
+  sections:
+    core_task:
+      label: "核心任务"
+      aliases: ["core task", "核心任务", "任务目标", "goal"]
+      kind: "text"
+task_type_overrides: {}
+project_overrides: {}
 ```
 
 ## state/tasks/<task_id>/evidence_map.yaml

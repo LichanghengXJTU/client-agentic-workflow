@@ -47,6 +47,7 @@ def _required_file_checks(root: Path) -> list[AuditIssue]:
         "state/PROJECT_REGISTRY.yaml",
         "state/KB_CONFIG.yaml",
         "state/KB_MANIFEST.yaml",
+        "state/PROMPT_CONTRACTS.yaml",
         "state/DECISIONS.md",
         "state/CHECKPOINTS.md",
         "state/HUMAN_REVIEW_LOG.md",
@@ -460,6 +461,202 @@ def _kb_manifest_quality(root: Path) -> list[AuditIssue]:
     return issues
 
 
+def _intake_subtask_schema(root: Path) -> list[AuditIssue]:
+    issues: list[AuditIssue] = []
+    task_root = root / "state" / "tasks"
+    if not task_root.exists():
+        return issues
+
+    for task_dir in sorted(path for path in task_root.iterdir() if path.is_dir()):
+        task_id = task_dir.name
+        intake_path = task_dir / "intake.yaml"
+        subtasks_path = task_dir / "subtasks.yaml"
+
+        if intake_path.exists():
+            intake = read_yaml(intake_path)
+            if str(intake.get("task_id", "")) != task_id:
+                issues.append(
+                    AuditIssue(
+                        severity="P1",
+                        category="intake_subtask_schema",
+                        message=f"{intake_path.as_posix()} task_id mismatch.",
+                        suggestion="Align intake.task_id with directory task id.",
+                    )
+                )
+            if not isinstance(intake.get("sections"), dict):
+                issues.append(
+                    AuditIssue(
+                        severity="P1",
+                        category="intake_subtask_schema",
+                        message=f"{intake_path.as_posix()} missing mapping `sections`.",
+                        suggestion="Write intake sections as mapping.",
+                    )
+                )
+            if not isinstance(intake.get("completeness"), dict):
+                issues.append(
+                    AuditIssue(
+                        severity="P1",
+                        category="intake_subtask_schema",
+                        message=f"{intake_path.as_posix()} missing mapping `completeness`.",
+                        suggestion="Write completeness with missing_required + score.",
+                    )
+                )
+
+            raw_prompt_ref = str(intake.get("raw_prompt_ref", "")).strip()
+            if raw_prompt_ref and not (root / raw_prompt_ref).exists():
+                issues.append(
+                    AuditIssue(
+                        severity="P1",
+                        category="intake_subtask_schema",
+                        message=f"{intake_path.as_posix()} raw_prompt_ref missing file `{raw_prompt_ref}`.",
+                        suggestion="Fix raw_prompt_ref path or regenerate intake artifact.",
+                    )
+                )
+
+        if subtasks_path.exists():
+            subtasks = read_yaml(subtasks_path).get("subtasks", [])
+            if not isinstance(subtasks, list):
+                issues.append(
+                    AuditIssue(
+                        severity="P0",
+                        category="intake_subtask_schema",
+                        message=f"{subtasks_path.as_posix()} has non-list `subtasks`.",
+                        suggestion="Set subtasks as YAML list.",
+                    )
+                )
+                continue
+
+            seen_ids: set[str] = set()
+            for idx, subtask in enumerate(subtasks):
+                if not isinstance(subtask, dict):
+                    issues.append(
+                        AuditIssue(
+                            severity="P0",
+                            category="intake_subtask_schema",
+                            message=f"{subtasks_path.as_posix()} subtasks[{idx}] is not mapping.",
+                            suggestion="Rewrite subtask entry as mapping.",
+                        )
+                    )
+                    continue
+                sid = str(subtask.get("id", "")).strip()
+                if not sid:
+                    issues.append(
+                        AuditIssue(
+                            severity="P0",
+                            category="intake_subtask_schema",
+                            message=f"{subtasks_path.as_posix()} subtasks[{idx}] missing id.",
+                            suggestion="Set non-empty subtask id (e.g. ST-001).",
+                        )
+                    )
+                elif sid in seen_ids:
+                    issues.append(
+                        AuditIssue(
+                            severity="P0",
+                            category="intake_subtask_schema",
+                            message=f"{subtasks_path.as_posix()} duplicated subtask id `{sid}`.",
+                            suggestion="Ensure subtask ids are unique per task.",
+                        )
+                    )
+                else:
+                    seen_ids.add(sid)
+
+                owner = str(subtask.get("owner", ""))
+                if owner not in {"planner", "retriever", "implementer", "critic", "scribe", "human"}:
+                    issues.append(
+                        AuditIssue(
+                            severity="P1",
+                            category="intake_subtask_schema",
+                            message=f"{subtasks_path.as_posix()} subtasks[{idx}] invalid owner `{owner}`.",
+                            suggestion="Use owner enum planner/retriever/implementer/critic/scribe/human.",
+                        )
+                    )
+                status = str(subtask.get("status", ""))
+                if status not in {"todo", "in_progress", "waiting_review", "done", "blocked"}:
+                    issues.append(
+                        AuditIssue(
+                            severity="P1",
+                            category="intake_subtask_schema",
+                            message=f"{subtasks_path.as_posix()} subtasks[{idx}] invalid status `{status}`.",
+                            suggestion="Use todo/in_progress/waiting_review/done/blocked.",
+                        )
+                    )
+    return issues
+
+
+def _review_queue_scope_consistency(root: Path) -> list[AuditIssue]:
+    issues: list[AuditIssue] = []
+    queue_path = root / "state" / "REVIEW_QUEUE.yaml"
+    if not queue_path.exists():
+        return issues
+
+    data = read_yaml(queue_path)
+    items = data.get("items", [])
+    if not isinstance(items, list):
+        issues.append(
+            AuditIssue(
+                severity="P0",
+                category="review_queue_scope",
+                message="state/REVIEW_QUEUE.yaml has non-list `items`.",
+                suggestion="Set items as YAML list.",
+            )
+        )
+        return issues
+
+    for idx, item in enumerate(items):
+        if not isinstance(item, dict):
+            issues.append(
+                AuditIssue(
+                    severity="P0",
+                    category="review_queue_scope",
+                    message=f"REVIEW_QUEUE items[{idx}] is not mapping.",
+                    suggestion="Rewrite review queue item as mapping.",
+                )
+            )
+            continue
+        scope = str(item.get("scope", "task"))
+        if scope not in {"task", "subtask"}:
+            issues.append(
+                AuditIssue(
+                    severity="P0",
+                    category="review_queue_scope",
+                    message=f"REVIEW_QUEUE items[{idx}] invalid scope `{scope}`.",
+                    suggestion="Use scope task/subtask.",
+                )
+            )
+            continue
+        if scope == "subtask":
+            subtask_id = str(item.get("subtask_id", "")).strip()
+            task_id = str(item.get("task_id", "")).strip()
+            if not task_id or not subtask_id:
+                issues.append(
+                    AuditIssue(
+                        severity="P0",
+                        category="review_queue_scope",
+                        message=f"REVIEW_QUEUE items[{idx}] subtask scope requires task_id + subtask_id.",
+                        suggestion="Provide both task_id and subtask_id for subtask review items.",
+                    )
+                )
+                continue
+            subtasks_path = root / "state" / "tasks" / task_id / "subtasks.yaml"
+            if subtasks_path.exists():
+                subtasks = read_yaml(subtasks_path).get("subtasks", [])
+                known = {
+                    str(sub.get("id"))
+                    for sub in subtasks
+                    if isinstance(sub, dict) and str(sub.get("id", "")).strip()
+                }
+                if subtask_id not in known:
+                    issues.append(
+                        AuditIssue(
+                            severity="P1",
+                            category="review_queue_scope",
+                            message=f"REVIEW_QUEUE items[{idx}] points to missing subtask `{subtask_id}` in {task_id}.",
+                            suggestion="Sync review queue from subtasks again or fix subtask id.",
+                        )
+                    )
+    return issues
+
+
 def _secret_path_guard(root: Path, tasks_data: dict, results_data: dict, kb_manifest: dict) -> list[AuditIssue]:
     issues: list[AuditIssue] = []
     banned_fragment = "state/AI_SECRETS.local.yaml#L"
@@ -574,6 +771,8 @@ def run_audit(cwd: str | Path | None = None) -> AuditResult:
     issues.extend(_handoff_integrity(root))
     issues.extend(_run_meta_completeness(root))
     issues.extend(_kb_manifest_quality(root))
+    issues.extend(_intake_subtask_schema(root))
+    issues.extend(_review_queue_scope_consistency(root))
     issues.extend(_secret_path_guard(root, tasks_data, results_data, kb_manifest_data))
 
     p0, p1, p2 = _group_counts(issues)
@@ -680,6 +879,22 @@ def run_audit(cwd: str | Path | None = None) -> AuditResult:
             lines.append(f"- [{issue.severity}] {issue.message} | Fix: {issue.suggestion}")
     else:
         lines.append("- PASS: KB manifest quality checks passed.")
+
+    lines.extend(["", "## Intake/Subtask schema"])
+    intake_subtasks = [i for i in issues if i.category == "intake_subtask_schema"]
+    if intake_subtasks:
+        for issue in intake_subtasks:
+            lines.append(f"- [{issue.severity}] {issue.message} | Fix: {issue.suggestion}")
+    else:
+        lines.append("- PASS: intake/subtask schema checks passed.")
+
+    lines.extend(["", "## Review Queue scope consistency"])
+    queue_scope = [i for i in issues if i.category == "review_queue_scope"]
+    if queue_scope:
+        for issue in queue_scope:
+            lines.append(f"- [{issue.severity}] {issue.message} | Fix: {issue.suggestion}")
+    else:
+        lines.append("- PASS: review queue scope checks passed.")
 
     lines.extend(["", "## Secret path guard"])
     secret_guard = [i for i in issues if i.category == "secret_path_guard"]

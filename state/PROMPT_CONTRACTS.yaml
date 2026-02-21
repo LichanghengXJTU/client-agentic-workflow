@@ -1,0 +1,46 @@
+version: 1
+default_contract:
+  required_sections:
+  - core_task
+  - required_files
+  - workflow
+  - response_style
+  - acceptance
+  - constraints
+  - deliverables
+  sections:
+    core_task:
+      label: 核心任务
+      aliases: [core task, 核心任务, 任务目标, goal]
+      kind: text
+    required_files:
+      label: 需要提供的文件
+      aliases: [required files, files, 文件, 材料]
+      kind: list
+    workflow:
+      label: 工作流程
+      aliases: [workflow, 流程, 步骤]
+      kind: list
+    response_style:
+      label: 回答方式
+      aliases: [response style, 回答方式, 输出风格]
+      kind: text
+    acceptance:
+      label: 验收标准
+      aliases: [acceptance, 验收, 成功标准]
+      kind: list
+    constraints:
+      label: 约束
+      aliases: [constraints, 约束, 限制]
+      kind: list
+    deliverables:
+      label: 产出
+      aliases: [deliverables, 产出, 输出物]
+      kind: list
+    visualization:
+      label: 可视化需求
+      aliases: [visualization, 可视化, 图片]
+      kind: enum
+      choices: [auto, required, none]
+task_type_overrides: {}
+project_overrides: {}
