@@ -174,8 +174,12 @@ python -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
 - 配置文件：`state/AI_CONFIG.yaml`。
 - 账本文件：`state/AI_BUDGET.yaml`。
 - 模型路由：`plan/audit -> pro`，`task(type) -> pro/codex`。
+- 模型版本基线（as-of `2026-02-21`，真值来源 `state/AI_CONFIG.yaml`）：
+  - `pro = gpt-5.2-pro`
+  - `codex = gpt-5.2-codex`
+  - `hard_limit_model = gpt-5-mini`
 - 预算策略：80% 预警、100% 降级 `hard_limit_model`（默认 `gpt-5-mini`）。
-- 支持自动 fallback chain（模型不可用时按路由链回退）。
+- 支持自动 fallback chain（模型不可用时按路由链回退；具体链路以 `state/AI_CONFIG.yaml` 为准）。
 - 无 API key 时生成 pending 报告，不中断流程。
 - Prompt Composer（V2）：
   - 模块清单：`prompts/registry.yaml`
@@ -220,8 +224,9 @@ python -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
 - Jobs & AI
 
 其中：
+- 双通道语义（非双网络端口）：输入端 `Intake Center` 接收 prompt/上下文，输出端 `Execution Center` 连续展示任务动态流（类似任务栏滚动输出）。
 - Intake Center 用于长文本输入拆解（文件/目标/流程/回答方式）并一次性创建任务+子任务。
-- Execution Center 用于任务输出聚合（动态流、模型反馈、子任务审批、PR 摘要、图片结果）。
+- Execution Center 用于任务输出聚合（动态流、模型反馈、子任务审批、PR 摘要、图片结果），形成“输入 prompt -> 任务流输出”闭环。
 - 关键 git 写操作仍有确认 guard，降低误操作风险。
 
 ### 5.4 `tests/` 回归防线
@@ -393,6 +398,7 @@ python3 -m workflow ai task --id T-0015 --intent run --response-profile paper_en
 ## 11. 附录入口（Appendix）
 - 文件级深度附录：`docs/README_FILE_INDEX.zh-CN.md`
 - 日常操作手册：`docs/WORKFLOW.md`
+- 仓库可见性与默认分支运维：`docs/WORKFLOW.md`（第 12 节）
 - 数据模型规范：`docs/DATA_MODEL.md`
 - 治理规范：`docs/GOVERNANCE.md`
 - 任务工作流规范：`docs/TASK_WORKFLOW.md`

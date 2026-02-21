@@ -6,6 +6,8 @@
 - 适用仓库：`client-agentic-workflow`
 - 主文档：`README.md`
 - 目标：让评审者可以从“描述 -> 文件 -> 测试 -> 产物”快速穿透。
+- 模型版本真值来源：`state/AI_CONFIG.yaml`（本文出现的模型版本为 `2026-02-21` 快照）。
+- 仓库可见性与默认分支运维入口：`docs/WORKFLOW.md` 第 12 节。
 
 ## 2. 核心文件逐项说明清单
 
@@ -31,7 +33,7 @@
 | `workflow/release_ops.py` | cross-repo release automation | `bootstrap_release_repo`, `publish_project_release`, `open_release_pr` | project slug, repo settings | release metadata | release repo pushes + `state/PR_REGISTRY.yaml` | `tests/test_release_ops.py` |
 | `workflow/ai.py` | AI 调用与预算守卫 + 任务路由 | `run_ai_plan`, `run_ai_audit`, `run_ai_task`, `resolve_route`, `invoke_with_fallback` | prompt/task + budget + api key | plan/audit/task markdown, budget updates | `state/AI_BUDGET.yaml`, `state/PLAN.md`, `artifacts/audit/ai-*.md`, `artifacts/tasks/*/ai/*.md` | `tests/test_ai_budget.py`, `tests/test_ai_routing.py`, `tests/test_ai_fallback.py` |
 | `workflow/prompt_composer.py` | Prompt Composer（模块化拼装 + 预算裁剪） | `compose_prompt`, `normalize_prompting_config`, `default_prompting_config` | command/task context + AI config + project override | composed prompt package + module selection metadata | 无直接 state 改写 | `tests/test_prompt_composer.py`, `tests/test_ai_cli.py` |
-| `dashboard/app.py` | Streamlit UI 主入口 | `_render_*`, `main` | state + workflow module calls | web UI actions | 触发 workflow 副作用 | `tests/test_dashboard_smoke.py` |
+| `dashboard/app.py` | Streamlit 双通道输入输出中枢（Intake/Execution） | `_render_*`, `main` | state + workflow module calls | web UI actions | 触发 workflow 副作用 | `tests/test_dashboard_smoke.py` |
 | `dashboard/components.py` | UI 组件封装 | `git_write_guard`, `status_badge` | UI interaction | guarded actions | 无直接 state 改写 | `tests/test_dashboard_smoke.py`（导入级） |
 | `docs/WORKFLOW.md` | 日常命令手册 | command playbook | user intent | operational guidance | 无 | 文档审计间接覆盖 |
 | `docs/DATA_MODEL.md` | 数据模型契约 | YAML schema docs | model requirements | contract reference | 无 | `workflow/schemas.py` + tests 对齐 |

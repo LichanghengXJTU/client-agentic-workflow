@@ -347,3 +347,27 @@ tasks:
   - T-0016
   created_at: '2026-02-22'
   updated_at: '2026-02-22'
+- id: T-0018
+  title: README/附录全量同步并执行仓库公开化（主仓 public + release default branch main）
+  type: meta
+  priority: P0
+  owner: codex
+  status: done
+  acceptance:
+  - README 与附录文档同步模型版本基线、双通道语义、可见性运维入口
+  - 主仓 client-agentic-workflow 可见性切换为 public
+  - release 仓 rl-gridworld-qlearning-release 保持 public 且默认分支为 main
+  evidence:
+  - README.md
+  - docs/README_FILE_INDEX.zh-CN.md
+  - docs/WORKFLOW.md
+  - docs/DATA_MODEL.md
+  - state/STATE.md
+  verification:
+  - gh repo view LichanghengXJTU/client-agentic-workflow --json visibility,isPrivate,defaultBranchRef
+  - gh repo view LichanghengXJTU/rl-gridworld-qlearning-release --json visibility,isPrivate,defaultBranchRef
+  - rg -n "gpt-5.2-pro|gpt-5.2-codex|gpt-5-mini|双通道|Intake Center|Execution Center" README.md docs/WORKFLOW.md docs/README_FILE_INDEX.zh-CN.md
+  depends_on:
+  - T-0017
+  created_at: '2026-02-21'
+  updated_at: '2026-02-21'

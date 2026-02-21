@@ -178,3 +178,20 @@ results:
   first_seen_commit: TBD
   last_confirmed_commit: TBD
   checkpoint_tags: []
+- id: KR-0011
+  statement: 主仓 `client-agentic-workflow` 已切换为 PUBLIC，release 仓保持 PUBLIC 且默认分支回归 `main`；可见性运维命令已文档化。
+  status: verified
+  confidence: high
+  evidence:
+  - state/STATE.md
+  - docs/WORKFLOW.md
+  - https://github.com/LichanghengXJTU/client-agentic-workflow
+  - https://github.com/LichanghengXJTU/rl-gridworld-qlearning-release
+  verification:
+  - gh repo view LichanghengXJTU/client-agentic-workflow --json visibility,isPrivate,defaultBranchRef
+  - gh repo view LichanghengXJTU/rl-gridworld-qlearning-release --json visibility,isPrivate,defaultBranchRef
+  related_tasks:
+  - T-0018
+  first_seen_commit: TBD
+  last_confirmed_commit: TBD
+  checkpoint_tags: []

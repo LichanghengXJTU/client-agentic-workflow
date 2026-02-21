@@ -343,3 +343,29 @@
   - refreshed `state/tasks/T-0015/evidence_map.yaml` sha for `docs/WORKFLOW.md` and `docs/TASK_WORKFLOW.md` after doc updates.
 - KEY_RESULTS decision:
   - no new critical scientific/algorithmic conclusion added; `state/KEY_RESULTS.yaml` unchanged in this round.
+
+## README/Appendix Sync + Repository Visibility Update (2026-02-21)
+- Scope:
+  - synced `README.md`, `docs/README_FILE_INDEX.zh-CN.md`, `docs/WORKFLOW.md`, `docs/DATA_MODEL.md`.
+  - aligned terminology to dual-channel semantics (input/output channels, not dual network ports).
+- Pre-change snapshot:
+  - `LichanghengXJTU/client-agentic-workflow`: `visibility=PRIVATE`, `defaultBranchRef=main`.
+  - `LichanghengXJTU/rl-gridworld-qlearning-release`: `visibility=PUBLIC`, `defaultBranchRef=sync/20260221-0311-7f47818b`.
+- Security precheck:
+  - `state/AI_SECRETS.local.yaml` is still gitignored and untracked.
+  - secret pattern scan found only key-name references, no leaked key values in tracked files.
+- Documentation updates:
+  - AI model baseline (as-of `2026-02-21`) now explicitly documented with source-of-truth pointer to `state/AI_CONFIG.yaml`.
+  - dashboard interaction clarified as dual channels:
+    - input channel: `Intake Center` for prompt/context intake
+    - output channel: `Execution Center` for continuous task-stream output
+  - added GitHub visibility/default-branch ops section in `docs/WORKFLOW.md` (Section 12).
+- GitHub operations executed:
+  - `gh repo edit LichanghengXJTU/client-agentic-workflow --visibility public --accept-visibility-change-consequences`
+  - `gh repo edit LichanghengXJTU/rl-gridworld-qlearning-release --default-branch main`
+- Post-change verification:
+  - `LichanghengXJTU/client-agentic-workflow`: `visibility=PUBLIC`, `isPrivate=false`, `defaultBranchRef=main`.
+  - `LichanghengXJTU/rl-gridworld-qlearning-release`: `visibility=PUBLIC`, `isPrivate=false`, `defaultBranchRef=main`.
+- Governance sync:
+  - added task record `T-0018` in `state/TASKS.yaml`.
+  - added key result `KR-0011` in `state/KEY_RESULTS.yaml`.

@@ -340,3 +340,8 @@ documents:
 ## Schema Enforcement
 - `workflow/schemas.py` 提供 TASKS / KEY_RESULTS 的强校验。
 - `python -m workflow audit` 若 schema 不合法会报 P0，并给修复建议。
+
+## GitHub Runtime Facts（非 schema 字段）
+- 仓库 `visibility` 与 `defaultBranchRef` 属于 GitHub 托管平台运行态事实，不是本仓库 YAML schema 强制字段。
+- 文档中提到的模型版本与仓库可见性状态是快照描述；模型真值来源为 `state/AI_CONFIG.yaml`，仓库状态真值来源为 `gh repo view ... --json ...`。
+- 建议将关键可见性结论写入 `state/KEY_RESULTS.yaml`，并在 `state/STATE.md` 留存执行前后快照。

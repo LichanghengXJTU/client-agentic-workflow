@@ -94,8 +94,12 @@ python3 -m workflow ai task --id T-0015 --intent run --response-profile paper_en
 - 密钥（本地不入库）：`state/AI_SECRETS.local.yaml` 或 `OPENAI_API_KEY`
 - 预算账本：`state/AI_BUDGET.yaml`
 - 路由：`plan/audit -> pro`，`task.type -> pro/codex`（`experiment` 支持 `design/run`）。
+- 模型版本基线（as-of `2026-02-21`，真值来源 `state/AI_CONFIG.yaml`）：
+  - `pro = gpt-5.2-pro`
+  - `codex = gpt-5.2-codex`
+  - `hard_limit_model = gpt-5-mini`
 - 80% 预警，100% 自动降级 `hard_limit_model`（默认 `gpt-5-mini`）。
-- 模型不可用时按 route 对应 fallback chain 自动回退。
+- 模型不可用时按 route 对应 fallback chain 自动回退，具体链路以 `state/AI_CONFIG.yaml` 为准。
 - Prompt Composer：
   - 全局模块：`prompts/registry.yaml` + `prompts/modules/*`
   - 项目覆盖：`projects/<slug>/prompts/registry.yaml`（同 ID 模块覆盖全局）
@@ -130,6 +134,10 @@ Tabs:
 - Audit & Verify
 - Jobs & AI
 
+- 双通道定义（非双网络端口）：
+  - 输入端：`Intake Center`（输入 prompt/上下文）
+  - 输出端：`Execution Center`（任务动态流输出，类聊天滚动体验）
+
 Intake Center:
 - 输入长文本 prompt + 仓库文件路径 + 可选上传附件
 - 自动拆解为结构化 sections，并给 completeness + clarifications
@@ -154,3 +162,26 @@ Execution Center:
 - macOS/Linux: 直接使用本文命令。
 - Windows PowerShell: 将 `python3` 改为 `python`，路径分隔符可用 `\\`。
 - 后台任务命令（jobs）在 Windows 上可能不支持进程组终止，若 stop 失败可手动结束进程。
+
+## 12. 仓库可见性与默认分支运维（GitHub）
+查看当前状态：
+```bash
+gh repo view LichanghengXJTU/client-agentic-workflow --json nameWithOwner,url,visibility,isPrivate,defaultBranchRef
+gh repo view LichanghengXJTU/rl-gridworld-qlearning-release --json nameWithOwner,url,visibility,isPrivate,defaultBranchRef
+```
+
+设置主仓为公开：
+```bash
+gh repo edit LichanghengXJTU/client-agentic-workflow --visibility public --accept-visibility-change-consequences
+```
+
+设置 release 仓默认分支为 `main`：
+```bash
+gh repo edit LichanghengXJTU/rl-gridworld-qlearning-release --default-branch main
+```
+
+可选回退命令：
+```bash
+gh repo edit LichanghengXJTU/client-agentic-workflow --visibility private --accept-visibility-change-consequences
+gh repo edit LichanghengXJTU/rl-gridworld-qlearning-release --default-branch <prechange-branch>
+```
