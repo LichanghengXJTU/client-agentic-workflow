@@ -1,3 +1,8 @@
-# Prompt-04 AI Plan
+# Prompt-04 AI Plan (Project-Specific)
 
-基于当前 TASKS 和项目目录，生成下一阶段可执行计划，重点检查缺失验证、缺失证据、以及跨库发布前置条件。
+Generate decision-complete next-step plan for RL project.
+
+## Required
+- missing verification and evidence checklist
+- rollback-safe execution order
+- acceptance criteria with concrete commands

@@ -33,6 +33,14 @@ def test_resolve_route_matrix() -> None:
     assert resolve_route("experiment", "run", "T-1", cfg)[0] == "codex"
 
 
+def test_default_ai_config_includes_prompting_defaults() -> None:
+    cfg = default_ai_config_v2()
+    prompting = cfg.get("prompting", {})
+    assert prompting.get("default_budget_profile") == "high"
+    assert prompting.get("math_rigor_default") == "strict"
+    assert prompting.get("step_visibility") == "layered_appendix"
+
+
 def test_legacy_config_is_compatible(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     (tmp_path / "state").mkdir()

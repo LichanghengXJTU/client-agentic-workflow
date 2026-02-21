@@ -134,6 +134,31 @@ effort_by_route:
   codex: "xhigh"
   hard_limit: "high"
 hard_limit_model: "gpt-5-mini"
+prompting:
+  default_response_profile:
+    plan: "qa_zh"
+    audit: "audit_cn"
+    task: "qa_zh"
+  default_budget_profile: "high"
+  budget_profiles:
+    high:
+      target_tokens: 12000
+      soft_limit_tokens: 18000
+      hard_limit_tokens: 24000
+    medium:
+      target_tokens: 8000
+      soft_limit_tokens: 12000
+      hard_limit_tokens: 16000
+    low:
+      target_tokens: 5000
+      soft_limit_tokens: 8000
+      hard_limit_tokens: 12000
+  viz_policy:
+    auto_on_commands: ["audit"]
+    auto_on_task_types: ["experiment"]
+  math_rigor_default: "strict"
+  step_visibility: "layered_appendix"
+  artifact_contract: "full_evidence_pack"
 ```
 
 ## state/tasks/<task_id>/brief.yaml

@@ -21,25 +21,47 @@ class ProjectRegistryResult:
 
 PROJECT_PROMPT_TEMPLATES: dict[str, str] = {
     "prompt-01-initiation.md": (
-        "# Prompt-01 Initiation\n\n"
-        "Create project scaffold and register 5 tasks (scaffold, implementation, verify-audit, "
-        "release automation, final review)."
+        "# Prompt-01 Initiation (Project-Specific)\n\n"
+        "Use Prompt Composer with project override enabled and generate an auditable task bootstrap checklist."
     ),
     "prompt-02-derivation.md": (
-        "# Prompt-02 Derivation\n\n"
-        "Write Q-learning update and Bellman relation in project derivations, and add a runnable check script."
+        "# Prompt-02 Derivation (Project-Specific)\n\n"
+        "Produce no-skip-step derivation assets and runnable verification checks for core formulas."
     ),
     "prompt-03-experiment.md": (
-        "# Prompt-03 Experiment\n\n"
-        "Implement deterministic Gridworld tabular Q-learning with fixed seed and save artifacts."
+        "# Prompt-03 Experiment (Project-Specific)\n\n"
+        "Implement deterministic experiments with reproducible outputs, tests, and auditable artifacts."
     ),
     "prompt-04-ai-plan.md": (
-        "# Prompt-04 AI Plan\n\n"
-        "Generate actionable next-step plan from current TASKS and project files; highlight missing evidence/verifications."
+        "# Prompt-04 AI Plan (Project-Specific)\n\n"
+        "Generate a decision-complete project plan with risk-ranked verification and rollback notes."
     ),
     "prompt-05-ai-audit.md": (
-        "# Prompt-05 AI Audit\n\n"
-        "Audit P0/P1/P2 risks for task state, key-result traceability, approval loop, and rollback safety."
+        "# Prompt-05 AI Audit (Project-Specific)\n\n"
+        "Audit P0/P1/P2 risks for formula rigor, code completeness, evidence traceability, and rollback safety."
+    ),
+}
+
+
+PROJECT_PROMPT_REGISTRY = """version: 2
+modules:
+  - id: project.scope
+    path: projects/{slug}/prompts/modules/project/scope.md
+    required: true
+    priority: 97
+    order: 35
+    commands: [all]
+    profiles: [all]
+    viz: any
+"""
+
+
+PROJECT_PROMPT_MODULES: dict[str, str] = {
+    "scope.md": (
+        "# Project Scope Module\n\n"
+        "- Keep outputs within this project scope.\n"
+        "- Require evidence + verification for critical claims.\n"
+        "- Keep rollback-safe execution sequence."
     ),
 }
 
@@ -114,6 +136,7 @@ def update_project(slug: str, updates: dict[str, Any]) -> dict[str, Any]:
 def scaffold_project(slug: str, title: str, base_dir: str = "projects") -> Path:
     root = Path(base_dir) / slug
     (root / "prompts").mkdir(parents=True, exist_ok=True)
+    (root / "prompts" / "modules" / "project").mkdir(parents=True, exist_ok=True)
     (root / "derivations").mkdir(parents=True, exist_ok=True)
     (root / "experiments").mkdir(parents=True, exist_ok=True)
     (root / "reports").mkdir(parents=True, exist_ok=True)
@@ -137,5 +160,14 @@ def scaffold_project(slug: str, title: str, base_dir: str = "projects") -> Path:
         prompt_path = root / "prompts" / name
         if not prompt_path.exists():
             prompt_path.write_text(content + "\n", encoding="utf-8")
+
+    registry_path = root / "prompts" / "registry.yaml"
+    if not registry_path.exists():
+        registry_path.write_text(PROJECT_PROMPT_REGISTRY.format(slug=slug) + "\n", encoding="utf-8")
+
+    for name, content in PROJECT_PROMPT_MODULES.items():
+        module_path = root / "prompts" / "modules" / "project" / name
+        if not module_path.exists():
+            module_path.write_text(content + "\n", encoding="utf-8")
 
     return root

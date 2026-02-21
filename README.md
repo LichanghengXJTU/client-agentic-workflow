@@ -177,6 +177,12 @@ python -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
 - 预算策略：80% 预警、100% 降级 `hard_limit_model`（默认 `gpt-5-mini`）。
 - 支持自动 fallback chain（模型不可用时按路由链回退）。
 - 无 API key 时生成 pending 报告，不中断流程。
+- Prompt Composer（V2）：
+  - 模块清单：`prompts/registry.yaml`
+  - 全局模块：`prompts/modules/*`
+  - 项目覆盖：`projects/<slug>/prompts/registry.yaml`（同 ID 覆盖全局）
+  - 参数：`--response-profile`、`--project`、`--viz`、`--prompt-budget`
+  - `--prompt` 手工输入优先，提供后会跳过 composer。
 
 ## 5. 代码框架详解（Code Framework）
 ### 5.1 `workflow/` 核心层
@@ -190,6 +196,7 @@ python -m workflow kb query --task T-0015 --q "rollback safety" --top-k 8
 - `kb_ops.py` / `citation_ops.py`：知识库与引用完整性。
 - `pr_ops.py` / `release_ops.py`：PR 与跨库发布自动化。
 - `ai.py`：Responses API 调用与预算守卫。
+- `prompt_composer.py`：模块化 prompt 组装与预算裁剪。
 
 ### 5.2 `state/` 治理层
 - `TASKS.yaml`：任务队列及状态机。
@@ -284,6 +291,11 @@ python3 -m workflow ai plan
 python3 -m workflow ai audit
 python3 -m workflow ai task --id T-0015 --intent design
 python3 -m workflow ai task --id T-0015 --intent run --output artifacts/tasks/T-0015/ai/custom.md
+
+# 启用 profile/project/viz/budget
+python3 -m workflow ai plan --response-profile qa_zh --project rl-gridworld-qlearning --viz auto --prompt-budget high
+python3 -m workflow ai audit --response-profile audit_cn --project rl-gridworld-qlearning --viz on --prompt-budget high
+python3 -m workflow ai task --id T-0015 --intent run --response-profile paper_en --project rl-gridworld-qlearning --viz auto --prompt-budget high
 ```
 
 ## 7. 质量门禁（Quality Gates）

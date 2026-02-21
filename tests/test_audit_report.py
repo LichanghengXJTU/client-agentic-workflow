@@ -31,6 +31,10 @@ def _init_repo(tmp_path: Path) -> Path:
     (repo / "state").mkdir()
     (repo / "docs").mkdir()
     (repo / "prompts").mkdir()
+    (repo / "prompts" / "modules" / "core").mkdir(parents=True)
+    (repo / "prompts" / "modules" / "math").mkdir(parents=True)
+    (repo / "prompts" / "modules" / "code").mkdir(parents=True)
+    (repo / "prompts" / "modules" / "output").mkdir(parents=True)
     (repo / "derivations").mkdir()
 
     (repo / "AGENTS.md").write_text("# AGENTS\n", encoding="utf-8")
@@ -46,6 +50,17 @@ def _init_repo(tmp_path: Path) -> Path:
     (repo / "docs" / "GOVERNANCE.md").write_text("# GOVERNANCE\n", encoding="utf-8")
     (repo / "prompts" / "planner.md").write_text("# planner\n", encoding="utf-8")
     (repo / "prompts" / "auditor.md").write_text("# auditor\n", encoding="utf-8")
+    (repo / "prompts" / "retriever.md").write_text("# retriever\n", encoding="utf-8")
+    (repo / "prompts" / "implementer.md").write_text("# implementer\n", encoding="utf-8")
+    (repo / "prompts" / "scribe.md").write_text("# scribe\n", encoding="utf-8")
+    (repo / "prompts" / "critic.md").write_text("# critic\n", encoding="utf-8")
+    (repo / "prompts" / "registry.yaml").write_text("version: 2\nmodules: []\n", encoding="utf-8")
+    (repo / "prompts" / "modules" / "core" / "governance.md").write_text("governance\n", encoding="utf-8")
+    (repo / "prompts" / "modules" / "math" / "strict_derivation.md").write_text("math\n", encoding="utf-8")
+    (repo / "prompts" / "modules" / "code" / "completeness.md").write_text("code\n", encoding="utf-8")
+    (repo / "prompts" / "modules" / "output" / "qa_zh.md").write_text("qa\n", encoding="utf-8")
+    (repo / "prompts" / "modules" / "output" / "paper_en.md").write_text("paper\n", encoding="utf-8")
+    (repo / "prompts" / "modules" / "output" / "audit_cn.md").write_text("audit\n", encoding="utf-8")
 
     (repo / "state" / "TASKS.yaml").write_text(
         """tasks:

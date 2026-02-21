@@ -14,6 +14,7 @@ from .jobs import list_jobs, start_job, stop_job, tail_job_log
 from .kb_ops import ingest_kb_sources, query_kb
 from .pr_ops import close_superseded_prs, current_pr_context, list_prs, open_pr, update_pr
 from .project_ops import add_project, list_projects, scaffold_project, update_project as update_project_record
+from .prompt_composer import ComposedPrompt, compose_prompt
 from .release_ops import bootstrap_release_repo, open_release_pr, publish_project_release
 from .review_ops import apply_review_action
 from .rollback import HARD_CONFIRM_PHRASE, rollback
@@ -424,14 +425,78 @@ def _read_optional_file(path: str | None) -> str:
     return p.read_text(encoding="utf-8")
 
 
+def _build_context_blocks(blocks: list[tuple[str, Any, bool, int]]) -> list[dict[str, Any]]:
+    context: list[dict[str, Any]] = []
+    for idx, (name, value, required, order) in enumerate(blocks):
+        if value is None:
+            continue
+        if isinstance(value, str) and not value:
+            continue
+        if isinstance(value, str):
+            text = value
+        else:
+            text = json.dumps(value, ensure_ascii=False, indent=2)
+        context.append(
+            {
+                "name": name,
+                "text": text,
+                "required": required,
+                "priority": 50 if required else 30,
+                "order": order + idx,
+            }
+        )
+    return context
+
+
+def _compose_for_ai(
+    *,
+    command: str,
+    task_type: str | None,
+    intent: str | None,
+    response_profile: str | None,
+    project: str | None,
+    viz: str | None,
+    prompt_budget: str | None,
+    context_blocks: list[dict[str, Any]],
+) -> ComposedPrompt:
+    ai_config = read_yaml("state/AI_CONFIG.yaml")
+    return compose_prompt(
+        command=command,
+        task_type=task_type,
+        intent=intent,
+        context_blocks=context_blocks,
+        ai_config=ai_config,
+        response_profile=response_profile,
+        project_slug=project,
+        viz=viz,
+        prompt_budget=prompt_budget,
+    )
+
+
 def cmd_ai_plan(args: argparse.Namespace) -> int:
     extra = _read_optional_file(args.input_file)
     tasks = read_yaml("state/TASKS.yaml")
-    prompt = args.prompt or (
-        "请基于当前任务队列生成下一阶段 PLAN，要求可执行、可验证、可回滚。\\n\\n"
-        f"TASKS:\\n{json.dumps(tasks, ensure_ascii=False, indent=2)}\\n\\n"
-        f"EXTRA:\\n{extra}\\n"
-    )
+    composed: ComposedPrompt | None = None
+    if args.prompt:
+        prompt = args.prompt
+    else:
+        context_blocks = _build_context_blocks(
+            [
+                ("TASKS", tasks, True, 1000),
+                ("EXTRA", extra, False, 1100),
+            ]
+        )
+        composed = _compose_for_ai(
+            command="plan",
+            task_type="plan",
+            intent=None,
+            response_profile=args.response_profile,
+            project=args.project,
+            viz=args.viz,
+            prompt_budget=args.prompt_budget,
+            context_blocks=context_blocks,
+        )
+        prompt = composed.text
     result = run_ai_plan(prompt=prompt, output_path="state/PLAN.md")
     append_state_event(
         "AI Plan",
@@ -443,7 +508,17 @@ def cmd_ai_plan(args: argparse.Namespace) -> int:
             f"Message: {result.message}",
         ],
     )
-    _print(result.__dict__)
+    payload = dict(result.__dict__)
+    if composed:
+        payload["prompt_composer"] = {
+            "selected_modules": composed.selected_modules,
+            "dropped_modules": composed.dropped_modules,
+            "estimated_tokens": composed.estimated_tokens,
+            "budget_profile": composed.budget_profile,
+            "response_profile": composed.response_profile,
+            "project_override_applied": composed.project_override_applied,
+        }
+    _print(payload)
     if not result.ok and "missing" in result.message.lower():
         return 0
     return 0 if result.ok else 1
@@ -453,12 +528,28 @@ def cmd_ai_audit(args: argparse.Namespace) -> int:
     extra = _read_optional_file(args.input_file)
     tasks = read_yaml("state/TASKS.yaml")
     key_results = read_yaml("state/KEY_RESULTS.yaml")
-    prompt = args.prompt or (
-        "请审计当前工作流状态，重点检查风险、验证覆盖率、审批闭环和回滚安全。\\n\\n"
-        f"TASKS:\\n{json.dumps(tasks, ensure_ascii=False, indent=2)}\\n\\n"
-        f"KEY_RESULTS:\\n{json.dumps(key_results, ensure_ascii=False, indent=2)}\\n\\n"
-        f"EXTRA:\\n{extra}\\n"
-    )
+    composed: ComposedPrompt | None = None
+    if args.prompt:
+        prompt = args.prompt
+    else:
+        context_blocks = _build_context_blocks(
+            [
+                ("TASKS", tasks, True, 1000),
+                ("KEY_RESULTS", key_results, True, 1010),
+                ("EXTRA", extra, False, 1100),
+            ]
+        )
+        composed = _compose_for_ai(
+            command="audit",
+            task_type="audit",
+            intent=None,
+            response_profile=args.response_profile,
+            project=args.project,
+            viz=args.viz,
+            prompt_budget=args.prompt_budget,
+            context_blocks=context_blocks,
+        )
+        prompt = composed.text
     result = run_ai_audit(prompt=prompt)
     append_state_event(
         "AI Audit",
@@ -470,7 +561,17 @@ def cmd_ai_audit(args: argparse.Namespace) -> int:
             f"Message: {result.message}",
         ],
     )
-    _print(result.__dict__)
+    payload = dict(result.__dict__)
+    if composed:
+        payload["prompt_composer"] = {
+            "selected_modules": composed.selected_modules,
+            "dropped_modules": composed.dropped_modules,
+            "estimated_tokens": composed.estimated_tokens,
+            "budget_profile": composed.budget_profile,
+            "response_profile": composed.response_profile,
+            "project_override_applied": composed.project_override_applied,
+        }
+    _print(payload)
     if not result.ok and "missing" in result.message.lower():
         return 0
     return 0 if result.ok else 1
@@ -480,12 +581,28 @@ def cmd_ai_task(args: argparse.Namespace) -> int:
     extra = _read_optional_file(args.input_file)
     task = task_by_id(args.id)
     intent = args.intent
-    prompt = args.prompt or (
-        "请围绕以下任务输出可执行、可验证、可回滚的工作结果。\\n\\n"
-        f"TASK:\\n{json.dumps(task, ensure_ascii=False, indent=2)}\\n\\n"
-        f"INTENT:\\n{intent or 'design'}\\n\\n"
-        f"EXTRA:\\n{extra}\\n"
-    )
+    composed: ComposedPrompt | None = None
+    if args.prompt:
+        prompt = args.prompt
+    else:
+        context_blocks = _build_context_blocks(
+            [
+                ("TASK", task, True, 1000),
+                ("INTENT", intent or "design", True, 1010),
+                ("EXTRA", extra, False, 1100),
+            ]
+        )
+        composed = _compose_for_ai(
+            command="task",
+            task_type=str(task.get("type", "meta")),
+            intent=intent,
+            response_profile=args.response_profile,
+            project=args.project,
+            viz=args.viz,
+            prompt_budget=args.prompt_budget,
+            context_blocks=context_blocks,
+        )
+        prompt = composed.text
     result = run_ai_task(
         task_id=args.id,
         intent=intent,
@@ -506,7 +623,17 @@ def cmd_ai_task(args: argparse.Namespace) -> int:
             f"Message: {result.message}",
         ],
     )
-    _print(result.__dict__)
+    payload = dict(result.__dict__)
+    if composed:
+        payload["prompt_composer"] = {
+            "selected_modules": composed.selected_modules,
+            "dropped_modules": composed.dropped_modules,
+            "estimated_tokens": composed.estimated_tokens,
+            "budget_profile": composed.budget_profile,
+            "response_profile": composed.response_profile,
+            "project_override_applied": composed.project_override_applied,
+        }
+    _print(payload)
     if not result.ok and "missing" in result.message.lower():
         return 0
     return 0 if result.ok else 1
@@ -752,11 +879,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_ai_plan = ai_sub.add_parser("plan", help="Generate PLAN.md with Responses API")
     p_ai_plan.add_argument("--prompt", help="Custom prompt override")
     p_ai_plan.add_argument("--input-file", help="Optional file appended into prompt context")
+    p_ai_plan.add_argument("--response-profile", choices=["qa_zh", "paper_en", "audit_cn"])
+    p_ai_plan.add_argument("--project", help="Optional project slug for prompt overrides")
+    p_ai_plan.add_argument("--viz", choices=["auto", "on", "off"], default="auto")
+    p_ai_plan.add_argument("--prompt-budget", choices=["high", "medium", "low"], default="high")
     p_ai_plan.set_defaults(func=cmd_ai_plan)
 
     p_ai_audit = ai_sub.add_parser("audit", help="Generate AI audit markdown report")
     p_ai_audit.add_argument("--prompt", help="Custom prompt override")
     p_ai_audit.add_argument("--input-file", help="Optional file appended into prompt context")
+    p_ai_audit.add_argument("--response-profile", choices=["qa_zh", "paper_en", "audit_cn"])
+    p_ai_audit.add_argument("--project", help="Optional project slug for prompt overrides")
+    p_ai_audit.add_argument("--viz", choices=["auto", "on", "off"], default="auto")
+    p_ai_audit.add_argument("--prompt-budget", choices=["high", "medium", "low"], default="high")
     p_ai_audit.set_defaults(func=cmd_ai_audit)
 
     p_ai_task = ai_sub.add_parser("task", help="Generate task-aware AI output with routed model selection")
@@ -764,6 +899,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_ai_task.add_argument("--intent", choices=["design", "run"], help="Optional task intent for experiment routing")
     p_ai_task.add_argument("--prompt", help="Custom prompt override")
     p_ai_task.add_argument("--input-file", help="Optional file appended into prompt context")
+    p_ai_task.add_argument("--response-profile", choices=["qa_zh", "paper_en", "audit_cn"])
+    p_ai_task.add_argument("--project", help="Optional project slug for prompt overrides")
+    p_ai_task.add_argument("--viz", choices=["auto", "on", "off"], default="auto")
+    p_ai_task.add_argument("--prompt-budget", choices=["high", "medium", "low"], default="high")
     p_ai_task.add_argument("--output", help="Optional output path override")
     p_ai_task.set_defaults(func=cmd_ai_task)
 

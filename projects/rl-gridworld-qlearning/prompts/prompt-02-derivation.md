@@ -1,3 +1,11 @@
-# Prompt-02 Derivation
+# Prompt-02 Derivation (Project-Specific)
 
-请在 projects/rl-gridworld-qlearning/derivations/ 写 Q-learning 与 Bellman 目标关系说明，并给一个可运行验证脚本，输出到项目目录。
+Use strict math profile (`math.strict_derivation` override applies).
+
+## Goals
+- Write no-skip-step derivation assets for Q-learning and Bellman relation.
+- Include appendix-level derivation logs and runnable checks.
+
+## Verification
+- symbolic consistency checks
+- numeric finite-MDP checks

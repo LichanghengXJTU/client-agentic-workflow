@@ -1,0 +1,91 @@
+version: 2
+modules:
+  - id: core.governance
+    path: prompts/modules/core/governance.md
+    required: true
+    priority: 100
+    order: 10
+    commands: [all]
+    profiles: [all]
+    viz: any
+
+  - id: core.evidence_traceability
+    path: prompts/modules/core/evidence_traceability.md
+    required: true
+    priority: 98
+    order: 20
+    commands: [all]
+    profiles: [all]
+    viz: any
+
+  - id: math.strict_derivation
+    path: prompts/modules/math/strict_derivation.md
+    required: true
+    priority: 95
+    order: 30
+    commands: [all]
+    profiles: [all]
+    viz: any
+
+  - id: math.reverification
+    path: prompts/modules/math/reverification.md
+    required: false
+    priority: 60
+    order: 40
+    commands: [plan, task, audit]
+    profiles: [qa_zh, paper_en, audit_cn]
+    viz: any
+
+  - id: code.completeness
+    path: prompts/modules/code/completeness.md
+    required: true
+    priority: 92
+    order: 50
+    commands: [plan, task, audit]
+    profiles: [all]
+    viz: any
+
+  - id: code.testing_artifacts
+    path: prompts/modules/code/testing_artifacts.md
+    required: false
+    priority: 58
+    order: 60
+    commands: [plan, task, audit]
+    profiles: [all]
+    viz: any
+
+  - id: output.qa_zh
+    path: prompts/modules/output/qa_zh.md
+    required: true
+    priority: 96
+    order: 70
+    commands: [plan, task]
+    profiles: [qa_zh]
+    viz: any
+
+  - id: output.paper_en
+    path: prompts/modules/output/paper_en.md
+    required: true
+    priority: 96
+    order: 70
+    commands: [plan, task]
+    profiles: [paper_en]
+    viz: any
+
+  - id: output.audit_cn
+    path: prompts/modules/output/audit_cn.md
+    required: true
+    priority: 96
+    order: 70
+    commands: [audit]
+    profiles: [audit_cn]
+    viz: any
+
+  - id: viz.auto_policy
+    path: prompts/modules/viz/auto_policy.md
+    required: false
+    priority: 55
+    order: 90
+    commands: [all]
+    profiles: [all]
+    viz: on

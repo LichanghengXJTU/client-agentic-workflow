@@ -1,3 +1,12 @@
-# Prompt-01 Initiation
+# Prompt-01 Initiation (Project-Specific)
 
-请为项目 rl-gridworld-qlearning 创建独立目录脚手架，并在 TASKS 中登记 5 个任务：脚手架、算法实现、验证审计、跨库发布、收尾审批。要求每个任务包含 acceptance/evidence/verification。
+Use Prompt Composer with `--project rl-gridworld-qlearning`.
+
+## Goals
+- Create or validate project scaffold and task registrations.
+- Ensure each task has acceptance/evidence/verification fields.
+- Enforce rollback-safe and auditable flow.
+
+## Output
+- Actionable checklist with commands.
+- Risks and missing evidence gaps.

@@ -1,0 +1,29 @@
+version: 2
+modules:
+  - id: math.strict_derivation
+    path: projects/rl-gridworld-qlearning/prompts/modules/math/strict_derivation.md
+    required: true
+    priority: 99
+    order: 30
+    commands: [all]
+    profiles: [all]
+    viz: any
+
+  - id: project.rl.scope
+    path: projects/rl-gridworld-qlearning/prompts/modules/project/scope.md
+    required: true
+    priority: 97
+    order: 35
+    commands: [all]
+    profiles: [all]
+    viz: any
+
+  - id: project.rl.viz
+    path: projects/rl-gridworld-qlearning/prompts/modules/project/viz.md
+    required: false
+    priority: 62
+    order: 95
+    commands: [task, audit]
+    task_types: [experiment, code, all]
+    profiles: [qa_zh, paper_en, audit_cn]
+    viz: on

@@ -37,4 +37,31 @@ hard_limit_model: gpt-5-mini
 price_per_1m_input_usd: 10.0
 price_per_1m_output_usd: 30.0
 price_per_1m_cached_input_usd: 2.5
+prompting:
+  default_response_profile:
+    plan: qa_zh
+    audit: audit_cn
+    task: qa_zh
+  default_budget_profile: high
+  budget_profiles:
+    high:
+      target_tokens: 12000
+      soft_limit_tokens: 18000
+      hard_limit_tokens: 24000
+    medium:
+      target_tokens: 8000
+      soft_limit_tokens: 12000
+      hard_limit_tokens: 16000
+    low:
+      target_tokens: 5000
+      soft_limit_tokens: 8000
+      hard_limit_tokens: 12000
+  viz_policy:
+    auto_on_commands:
+    - audit
+    auto_on_task_types:
+    - experiment
+  math_rigor_default: strict
+  step_visibility: layered_appendix
+  artifact_contract: full_evidence_pack
 notes: Do not store API key here. Put key in state/AI_SECRETS.local.yaml or OPENAI_API_KEY env.

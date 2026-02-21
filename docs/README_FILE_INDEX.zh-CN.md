@@ -30,6 +30,7 @@
 | `workflow/project_ops.py` | project registry 管理 | `add_project`, `update_project`, `scaffold_project` | slug/title/release metadata | project entry + scaffold files | `state/PROJECT_REGISTRY.yaml`, `projects/<slug>/` | `tests/test_project_registry.py` |
 | `workflow/release_ops.py` | cross-repo release automation | `bootstrap_release_repo`, `publish_project_release`, `open_release_pr` | project slug, repo settings | release metadata | release repo pushes + `state/PR_REGISTRY.yaml` | `tests/test_release_ops.py` |
 | `workflow/ai.py` | AI 调用与预算守卫 + 任务路由 | `run_ai_plan`, `run_ai_audit`, `run_ai_task`, `resolve_route`, `invoke_with_fallback` | prompt/task + budget + api key | plan/audit/task markdown, budget updates | `state/AI_BUDGET.yaml`, `state/PLAN.md`, `artifacts/audit/ai-*.md`, `artifacts/tasks/*/ai/*.md` | `tests/test_ai_budget.py`, `tests/test_ai_routing.py`, `tests/test_ai_fallback.py` |
+| `workflow/prompt_composer.py` | Prompt Composer（模块化拼装 + 预算裁剪） | `compose_prompt`, `normalize_prompting_config`, `default_prompting_config` | command/task context + AI config + project override | composed prompt package + module selection metadata | 无直接 state 改写 | `tests/test_prompt_composer.py`, `tests/test_ai_cli.py` |
 | `dashboard/app.py` | Streamlit UI 主入口 | `_render_*`, `main` | state + workflow module calls | web UI actions | 触发 workflow 副作用 | `tests/test_dashboard_smoke.py` |
 | `dashboard/components.py` | UI 组件封装 | `git_write_guard`, `status_badge` | UI interaction | guarded actions | 无直接 state 改写 | `tests/test_dashboard_smoke.py`（导入级） |
 | `docs/WORKFLOW.md` | 日常命令手册 | command playbook | user intent | operational guidance | 无 | 文档审计间接覆盖 |
@@ -37,7 +38,7 @@
 | `docs/GOVERNANCE.md` | 治理规则文档 | reject cascade policy | governance decisions | policy reference | 无 | `workflow/review_ops.py` 行为对齐 |
 | `docs/TASK_WORKFLOW.md` | 任务级协作规范 | role/handoff/evidence rules | task collaboration | rules reference | 无 | `workflow/task_ops.py`, `workflow/audit.py` 对齐 |
 | `docs/KB_WORKFLOW.md` | KB 流程规范 | ingest/query/citation rules | kb operations | rules reference | 无 | `workflow/kb_ops.py`, `workflow/citation_ops.py` 对齐 |
-| `docs/AI_PROMPTS.md` | prompt 治理规则 | prompt inventory | AI workflow governance | prompt policy | 无 | 审计 required files 检查 |
+| `docs/AI_PROMPTS.md` | prompt 治理规则 | module registry + override policy | AI workflow governance | prompt policy | 无 | 审计 required files 检查 |
 | `state/TASKS.yaml` | 任务台账 | `tasks[*]` | human/agent updates | task state | 驱动 review queue / execution | schema + audit checks |
 | `state/KEY_RESULTS.yaml` | 关键结论台账 | `results[*]` | validated claims | KR history | checkpoint tags / status downgrade | schema + audit + review cascade |
 | `state/REVIEW_QUEUE.yaml` | 审批队列 | `items[*]` | waiting_review tasks | review actions | task status transitions | `tests/test_review_queue_flow.py` |

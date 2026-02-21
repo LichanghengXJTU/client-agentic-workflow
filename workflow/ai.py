@@ -27,6 +27,29 @@ class AICallResult:
     message: str
 
 
+def _default_prompting_config() -> dict[str, Any]:
+    return {
+        "default_response_profile": {
+            "plan": "qa_zh",
+            "audit": "audit_cn",
+            "task": "qa_zh",
+        },
+        "default_budget_profile": "high",
+        "budget_profiles": {
+            "high": {"target_tokens": 12000, "soft_limit_tokens": 18000, "hard_limit_tokens": 24000},
+            "medium": {"target_tokens": 8000, "soft_limit_tokens": 12000, "hard_limit_tokens": 16000},
+            "low": {"target_tokens": 5000, "soft_limit_tokens": 8000, "hard_limit_tokens": 12000},
+        },
+        "viz_policy": {
+            "auto_on_commands": ["audit"],
+            "auto_on_task_types": ["experiment"],
+        },
+        "math_rigor_default": "strict",
+        "step_visibility": "layered_appendix",
+        "artifact_contract": "full_evidence_pack",
+    }
+
+
 def default_ai_config_v2() -> dict[str, Any]:
     return {
         "version": 2,
@@ -62,6 +85,7 @@ def default_ai_config_v2() -> dict[str, Any]:
         "price_per_1m_input_usd": 10.0,
         "price_per_1m_output_usd": 30.0,
         "price_per_1m_cached_input_usd": 2.5,
+        "prompting": _default_prompting_config(),
         "notes": "Do not store API key here. Put key in state/AI_SECRETS.local.yaml or OPENAI_API_KEY env.",
     }
 
@@ -81,7 +105,13 @@ def _normalize_ai_config(cfg: dict[str, Any]) -> dict[str, Any]:
     # v2 shape
     if isinstance(cfg.get("routing"), dict):
         merged = default_ai_config_v2()
-        merged.update({k: v for k, v in cfg.items() if k not in {"models", "routing", "fallback_chains", "effort_by_route"}})
+        merged.update(
+            {
+                k: v
+                for k, v in cfg.items()
+                if k not in {"models", "routing", "fallback_chains", "effort_by_route", "prompting"}
+            }
+        )
 
         incoming_models = cfg.get("models")
         if isinstance(incoming_models, dict):
@@ -94,6 +124,55 @@ def _normalize_ai_config(cfg: dict[str, Any]) -> dict[str, Any]:
         incoming_effort = cfg.get("effort_by_route")
         if isinstance(incoming_effort, dict):
             merged["effort_by_route"].update(incoming_effort)
+
+        incoming_prompting = cfg.get("prompting")
+        if isinstance(incoming_prompting, dict):
+            merged_prompting = _default_prompting_config()
+
+            incoming_defaults = incoming_prompting.get("default_response_profile")
+            if isinstance(incoming_defaults, str):
+                merged_prompting["default_response_profile"] = {
+                    "plan": incoming_defaults,
+                    "audit": incoming_defaults,
+                    "task": incoming_defaults,
+                }
+            elif isinstance(incoming_defaults, dict):
+                merged_prompting["default_response_profile"].update(
+                    {
+                        key: str(value)
+                        for key, value in incoming_defaults.items()
+                        if key in {"plan", "audit", "task"} and isinstance(value, str)
+                    }
+                )
+
+            if isinstance(incoming_prompting.get("default_budget_profile"), str):
+                merged_prompting["default_budget_profile"] = str(incoming_prompting["default_budget_profile"])
+
+            incoming_budget_profiles = incoming_prompting.get("budget_profiles")
+            if isinstance(incoming_budget_profiles, dict):
+                for profile_name, profile_cfg in incoming_budget_profiles.items():
+                    if not isinstance(profile_cfg, dict):
+                        continue
+                    current = dict(merged_prompting["budget_profiles"].get(profile_name, {}))
+                    current.update(
+                        {
+                            key: int(value)
+                            for key, value in profile_cfg.items()
+                            if key in {"target_tokens", "soft_limit_tokens", "hard_limit_tokens"} and isinstance(value, int)
+                        }
+                    )
+                    if current:
+                        merged_prompting["budget_profiles"][profile_name] = current
+
+            incoming_viz = incoming_prompting.get("viz_policy")
+            if isinstance(incoming_viz, dict):
+                merged_prompting["viz_policy"].update(incoming_viz)
+
+            for key in ["math_rigor_default", "step_visibility", "artifact_contract"]:
+                if isinstance(incoming_prompting.get(key), str):
+                    merged_prompting[key] = incoming_prompting[key]
+
+            merged["prompting"] = merged_prompting
 
         incoming_routing = cfg.get("routing")
         if isinstance(incoming_routing, dict):

@@ -61,6 +61,13 @@ def _required_file_checks(root: Path) -> list[AuditIssue]:
         "prompts/implementer.md",
         "prompts/scribe.md",
         "prompts/critic.md",
+        "prompts/registry.yaml",
+        "prompts/modules/core/governance.md",
+        "prompts/modules/math/strict_derivation.md",
+        "prompts/modules/code/completeness.md",
+        "prompts/modules/output/qa_zh.md",
+        "prompts/modules/output/paper_en.md",
+        "prompts/modules/output/audit_cn.md",
     ]
     issues: list[AuditIssue] = []
     for path in required:

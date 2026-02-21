@@ -273,3 +273,42 @@
   - `python3 -m workflow audit` -> P0=0/P1=0/P2=0 (`artifacts/audit/20260221-2038.md`).
 - Citation integrity update:
   - Refreshed `state/tasks/T-0015/evidence_map.yaml` `source_sha256` for `docs/WORKFLOW.md` after document edits.
+
+## AI Task
+- Task: T-0015
+- Route: codex
+- Requested model: gpt-5.2-codex
+- Model: gpt-5.2-codex
+- Selection note: normal
+- Output: artifacts/tasks/T-0015/ai/ai-20260222-002411.md
+- Budget spend USD: 0.39187
+- Budget ratio: 0.000
+- Message: ok
+
+## Prompt System V2 Upgrade (2026-02-22)
+- Implemented Prompt Composer V2: `workflow/prompt_composer.py`.
+- Added modular prompt registry and assets:
+  - global: `prompts/registry.yaml`, `prompts/modules/*`
+  - project override: `projects/rl-gridworld-qlearning/prompts/registry.yaml`, `projects/rl-gridworld-qlearning/prompts/modules/*`
+  - review layer: `.github/codex/prompts/review.md`
+- Extended AI CLI with composer-aware args in `workflow/__main__.py`:
+  - `--response-profile {qa_zh,paper_en,audit_cn}`
+  - `--project <slug>`
+  - `--viz {auto,on,off}`
+  - `--prompt-budget {high,medium,low}`
+- Extended AI config defaults/compatibility:
+  - `state/AI_CONFIG.yaml` now includes `prompting` block
+  - `workflow/ai.py` + `workflow/state_ops.py` keep backward compatibility
+- Updated governance/docs:
+  - `README.md`, `docs/WORKFLOW.md`, `docs/DATA_MODEL.md`, `docs/AI_PROMPTS.md`, `docs/README_FILE_INDEX.zh-CN.md`
+- Added tests:
+  - `tests/test_prompt_composer.py`
+  - expanded `tests/test_ai_cli.py`
+  - updated `tests/test_audit_report.py`
+- Verification:
+  - `.venv/bin/python -m pytest -q` -> 54 passed
+  - `.venv/bin/python -m workflow verify` -> PASS (`artifacts/test/verify-20260222-0028.md`)
+  - `.venv/bin/python -m workflow audit` -> P0=0/P1=0/P2=0 (`artifacts/audit/20260222-0028.md`)
+  - `.venv/bin/python -m workflow ai task --id T-0015 --response-profile paper_en --project rl-gridworld-qlearning --prompt-budget high --viz auto` -> OK (`artifacts/tasks/T-0015/ai/ai-20260222-002411.md`)
+- Citation integrity follow-up:
+  - updated `state/tasks/T-0015/evidence_map.yaml` sha for `docs/WORKFLOW.md` to clear verify/audit P0.

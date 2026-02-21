@@ -84,6 +84,11 @@ python3 -m workflow ai plan
 python3 -m workflow ai audit
 python3 -m workflow ai task --id T-0015 --intent design
 python3 -m workflow ai task --id T-0015 --intent run
+
+# Prompt Composer V2 参数
+python3 -m workflow ai plan --response-profile qa_zh --project rl-gridworld-qlearning --viz auto --prompt-budget high
+python3 -m workflow ai audit --response-profile audit_cn --project rl-gridworld-qlearning --viz on --prompt-budget high
+python3 -m workflow ai task --id T-0015 --intent run --response-profile paper_en --project rl-gridworld-qlearning --viz auto --prompt-budget high
 ```
 - 配置：`state/AI_CONFIG.yaml`
 - 密钥（本地不入库）：`state/AI_SECRETS.local.yaml` 或 `OPENAI_API_KEY`
@@ -91,6 +96,10 @@ python3 -m workflow ai task --id T-0015 --intent run
 - 路由：`plan/audit -> pro`，`task.type -> pro/codex`（`experiment` 支持 `design/run`）。
 - 80% 预警，100% 自动降级 `hard_limit_model`（默认 `gpt-5-mini`）。
 - 模型不可用时按 route 对应 fallback chain 自动回退。
+- Prompt Composer：
+  - 全局模块：`prompts/registry.yaml` + `prompts/modules/*`
+  - 项目覆盖：`projects/<slug>/prompts/registry.yaml`（同 ID 模块覆盖全局）
+  - 手工 `--prompt` 优先级最高，提供时跳过 composer
 
 ## 8.5 Task Role Run（run_meta）
 ```bash

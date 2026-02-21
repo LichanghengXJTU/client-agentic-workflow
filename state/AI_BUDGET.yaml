@@ -2,7 +2,7 @@ monthly_budget_usd: 2000.0
 alert_threshold: 0.8
 hard_limit_threshold: 1.0
 current_month: 2026-02
-spend_usd: 0.29784
+spend_usd: 0.39187
 entries:
 - time: '2026-02-21T00:44:30'
   task_type: audit
@@ -35,4 +35,16 @@ entries:
   output_tokens: 5657
   cached_tokens: 0
   cost_usd: 0.17017
+  note: normal
+- time: '2026-02-22T00:27:06'
+  task_type: task:code
+  route_key: codex
+  requested_model: gpt-5.2-codex
+  model: gpt-5.2-codex
+  fallback_hops: 0
+  selection_note: normal
+  input_tokens: 1201
+  output_tokens: 2734
+  cached_tokens: 0
+  cost_usd: 0.09403
   note: normal

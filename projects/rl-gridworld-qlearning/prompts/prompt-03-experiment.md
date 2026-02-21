@@ -1,3 +1,9 @@
-# Prompt-03 Experiment
+# Prompt-03 Experiment (Project-Specific)
 
-请实现 Gridworld tabular Q-learning（固定 seed），保存训练统计与收敛结果到 artifacts/experiments/rl-gridworld-qlearning/，并补 pytest。
+## Goals
+- Implement deterministic Gridworld tabular Q-learning.
+- Save artifacts, summaries, and reproducible run commands.
+- Add/maintain pytest for regression and convergence behavior.
+
+## Optional Viz
+- When enabled, output learning curves with source data traceability.
